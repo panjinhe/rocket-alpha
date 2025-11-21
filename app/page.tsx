@@ -1,5 +1,7 @@
 import { PaperCard } from "@/components/PaperCard";
 import { Eq } from "@/components/Math";
+// --- 关键修复：导入 lucide-react 中的图标 ---
+import { Activity, TrendingUp } from 'lucide-react';
 
 // 假设您的全局CSS已设置了基础字体变量，例如：
 // font-serif: Merriweather, Noto Serif SC
@@ -31,25 +33,61 @@ export default function Home() {
             <section className="py-16 container mx-auto max-w-7xl px-8">
                 <div className="grid md:grid-cols-3 gap-8">
 
-                    {/* 卡片 1: 因子动物园 (Factor Zoo) - 替换原“因子看板” */}
-                    <div className="bg-white border border-gray-200 p-8 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg hover:border-gray-300">
-                        <div className="flex justify-between items-baseline mb-6 border-b pb-4 border-gray-100">
-                            <h3 className="font-serif text-xl font-bold text-gray-800">因子动物园 Factor Zoo</h3>
-                            {/* 标签颜色改为红色 */}
-                            <span className="font-mono text-xs uppercase text-red-700 border border-red-700 px-1 py-0.5 rounded-sm">
-                                暴露度
+                    {/* 卡片 1: 因子动物园 (Factor Zoo) - 重新设计版本 */}
+                    <div className="bg-white border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-xl rounded-lg">
+                        {/* 标题和头部 */}
+                        <div className="flex justify-between items-center mb-5">
+                            <div className="flex items-center space-x-2">
+                                {/* 使用一个图标来代表 "因子" 或 "分析" */}
+                                <Activity className="w-5 h-5 text-gray-900" />
+                                <h3 className="font-serif text-lg font-bold text-gray-900">因子动物园 Factor Zoo</h3>
+                            </div>
+                            {/* 标签颜色保持红色，但样式更内敛 */}
+                            <span className="font-mono text-xs uppercase text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full font-medium">
+                                Risk Exposure
                             </span>
                         </div>
-                        <div className="space-y-4 text-sm text-gray-700">
-                            {/* 英文因子名称，中文趋势 */}
-                            <div className="flex justify-between"><span>Momentum</span><span className="text-green-600 font-medium">+1.5σ (Overweight)</span></div>
-                            <div className="flex justify-between"><span>Value</span><span className="text-red-600 font-medium">-1.0σ (Underweight)</span></div>
-                            <div className="flex justify-between"><span>Quality</span><span className="text-gray-500">0.2σ (Neutral)</span></div>
+
+                        {/* 核心指标强调区域 (Focus on best/worst performing) */}
+                        <div className="bg-gray-50 p-4 mb-5 rounded-md border border-gray-100">
+                            <p className="text-xs text-gray-500 uppercase font-mono mb-1">当前主导因子 (Alpha Drivers)</p>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-gray-700">Momentum</span>
+                                {/* 使用更大的字体和趋势图标来强调主导地位 */}
+                                <span className="flex items-center space-x-1 text-2xl font-bold text-green-700">
+                                    <TrendingUp className="w-5 h-5" />
+                                    <span>+1.50σ</span>
+                                </span>
+                            </div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-6 pt-2 border-t border-dashed border-gray-300">最后更新：2025-11-21</p>
-                        {/* 链接颜色改为红色 */}
-                        <a href="/factor-zoo" className="inline-block mt-4 font-mono text-sm text-gray-900 hover:text-red-700 border-b border-red-700 pb-px">
-                            因子风险仪表盘 &rarr;
+
+                        {/* 因子暴露度列表 */}
+                        <div className="space-y-3 text-sm">
+                            {/* 列表项 - Value */}
+                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
+                                <span className="text-gray-600">Value</span>
+                                <span className="font-mono text-red-600 font-medium">
+                                    -1.00σ
+                                </span>
+                            </div>
+
+                            {/* 列表项 - Quality */}
+                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
+                                <span className="text-gray-600">Quality</span>
+                                <span className="font-mono text-gray-500">
+                                    +0.20σ
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* 脚注和链接 */}
+                        <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">最后更新：2025-11-21</p>
+                        {/* 链接使用一个突出的按钮样式，引导用户点击 */}
+                        <a
+                            href="/factor-zoo"
+                            className="block mt-4 w-full text-center bg-red-700 text-white py-2 text-sm font-medium rounded-md hover:bg-red-800 transition-colors shadow-md"
+                        >
+                            进入动物园查看详情 &rarr;
                         </a>
                     </div>
 
