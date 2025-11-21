@@ -1,0 +1,230 @@
+'use client';
+
+import React, { useState } from 'react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Info, TrendingUp, Activity } from 'lucide-react';
+
+// --- 1. 定义 TypeScript 接口 ---
+
+// 定义单条因子数据的结构
+interface FactorData {
+    id: number;
+    name: string;
+    returnAnn: string;
+    excessAnn: string;
+    turnover: string;
+    icMean: string;
+    ir: string;
+    volatility: string;
+}
+
+// 定义所有可排序的列键名
+type SortKey = keyof Omit<FactorData, 'id' | 'name' | 'volatility'>;
+
+// 定义排序配置的结构
+interface SortConfig {
+    key: SortKey | null;
+    direction: 'asc' | 'desc';
+}
+
+// --- 2. 模拟数据 (使用 FactorData 接口) ---
+const initialData: FactorData[] = [
+    { id: 1, name: 'Momentum (动量)', returnAnn: '12.4', excessAnn: '5.2', turnover: '2.5', icMean: '0.06', ir: '1.8', volatility: '15%' },
+    { id: 2, name: 'Value (价值)', returnAnn: '-3.2', excessAnn: '-1.5', turnover: '1.2', icMean: '-0.02', ir: '-0.5', volatility: '12%' },
+    { id: 3, name: 'Size (市值)', returnAnn: '8.1', excessAnn: '2.1', turnover: '0.8', icMean: '0.03', ir: '0.9', volatility: '18%' },
+    { id: 4, name: 'Volatility (波动率)', returnAnn: '-5.4', excessAnn: '-4.2', turnover: '3.0', icMean: '-0.05', ir: '-1.2', volatility: '22%' },
+    { id: 5, name: 'Quality (质量)', returnAnn: '6.5', excessAnn: '1.8', turnover: '1.5', icMean: '0.04', ir: '1.1', volatility: '10%' },
+    { id: 6, name: 'Liquidity (流动性)', returnAnn: '4.2', excessAnn: '0.5', turnover: '4.1', icMean: '0.01', ir: '0.3', volatility: '14%' },
+    { id: 7, name: 'Growth (成长)', returnAnn: '10.1', excessAnn: '3.8', turnover: '2.2', icMean: '0.05', ir: '1.4', volatility: '19%' },
+];
+// 注意：将数值字段中的 '%' 移除，以便于进行浮点数排序
+
+// --- 3. 独立且类型化的工具组件 ---
+
+// 修复 TS7031 和 ESLint 错误：将 SortIcon 移出组件，并明确类型
+interface SortIconProps {
+    columnKey: SortKey;
+    sortConfig: SortConfig;
+}
+
+const SortIcon = ({ columnKey, sortConfig }: SortIconProps) => {
+    if (sortConfig.key !== columnKey) return <ArrowUpDown size={14} className="text-gray-300 ml-1" />;
+    return sortConfig.direction === 'asc'
+        ? <ArrowUp size={14} className="text-red-700 ml-1" />
+        : <ArrowDown size={14} className="text-red-700 ml-1" />;
+};
+
+// 修复 TS7006 错误：明确参数类型
+const getColorClass = (valStr: string): string => {
+    const val = parseFloat(valStr);
+    if (val > 0) return "text-green-700";
+    if (val < 0) return "text-red-700";
+    return "text-gray-600";
+};
+
+
+// --- 4. 主组件 FactorZooContent ---
+export default function FactorZooContent() {
+    const [timeRange, setTimeRange] = useState<'1Y' | '3Y'>('1Y');
+    // 使用定义的 SortConfig 接口
+    const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'desc' });
+    // 使用定义的 FactorData 接口
+    const [data, setData] = useState<FactorData[]>(initialData);
+
+
+    // 修复 TS7006 和 TS7053 错误：明确 key 的类型为 SortKey
+    const handleSort = (key: SortKey) => {
+        let direction: 'asc' | 'desc' = 'desc';
+        if (sortConfig.key === key && sortConfig.direction === 'desc') {
+            direction = 'asc';
+        }
+
+        const sortedData = [...data].sort((a, b) => {
+            // 类型安全的访问：a[key] 的值是字符串，但我们知道它代表一个数字
+            const valA = parseFloat(a[key]); // 修复 TS7053
+            const valB = parseFloat(b[key]); // 修复 TS7053
+
+            if (valA < valB) return direction === 'asc' ? -1 : 1;
+            if (valA > valB) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        setSortConfig({ key, direction });
+        setData(sortedData);
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50 p-8 font-sans">
+            <div className="max-w-7xl mx-auto mb-8">
+                {/* --- 顶部导航区 --- */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-900 pb-6">
+                    <div>
+                        <div className="flex items-center gap-3 mb-2">
+                            <h1 className="font-serif text-4xl font-bold text-gray-900">Factor Zoo</h1>
+                            <span className="px-2 py-1 text-xs border border-gray-900 bg-gray-900 text-white font-mono uppercase">
+                                Alpha One
+                            </span>
+                        </div>
+                        <p className="text-gray-600 font-serif italic">
+                            多因子风险与收益全景监控 / 沪深全市场 (A-Share Universe)
+                        </p>
+                    </div>
+
+                    {/* 时间与操作区 */}
+                    <div className="flex items-center gap-4 mt-4 md:mt-0">
+                        <div className="flex bg-white border border-gray-300 rounded-sm p-1 shadow-sm">
+                            <button
+                                onClick={() => setTimeRange('1Y')}
+                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '1Y' ? 'bg-gray-100 text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'}`}
+                            >
+                                近一年 (1Y)
+                            </button>
+                            <div className="w-px bg-gray-200 my-1"></div>
+                            <button
+                                onClick={() => setTimeRange('3Y')}
+                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '3Y' ? 'bg-gray-100 text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'}`}
+                            >
+                                近三年 (3Y)
+                            </button>
+                        </div>
+                        <button className="bg-red-700 text-white px-4 py-2 text-sm font-medium hover:bg-red-800 shadow-sm transition-colors">
+                            导出数据 CSV
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* --- 概览指标卡 (Dashboard Summary) --- */}
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                {[
+                    { label: "最佳表现因子", value: "Momentum", sub: "+12.4% Ann.", icon: <TrendingUp size={16}/> },
+                    { label: "最高 IC 均值", value: "Momentum", sub: "0.06 Mean IC", icon: <Activity size={16}/> },
+                    { label: "市场拥挤度", value: "High", sub: "Turnover Spike", icon: <Info size={16}/> },
+                    { label: "数据更新时间", value: "2025-11-21", sub: "Daily Close", icon: null },
+                ].map((card, idx) => (
+                    <div key={idx} className="bg-white p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-gray-900">
+                        <div className="text-xs text-gray-500 uppercase font-mono mb-1 flex items-center gap-2">
+                            {card.icon} {card.label}
+                        </div>
+                        <div className="text-xl font-serif font-bold text-gray-900">{card.value}</div>
+                        <div className={`text-sm font-mono mt-1 ${idx === 0 ? 'text-green-700' : 'text-gray-500'}`}>{card.sub}</div>
+                    </div>
+                ))}
+            </div>
+
+            {/* --- 核心数据表格 --- */}
+            <div className="max-w-7xl mx-auto bg-white border border-gray-200 shadow-lg">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                        <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-medium tracking-wider">
+                            <th className="p-4 w-48 font-serif text-gray-900">因子名称 (Factor)</th>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('returnAnn')}>
+                                <div className="flex items-center">年化收益率 <SortIcon columnKey="returnAnn" sortConfig={sortConfig} /></div>
+                            </th>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('excessAnn')}>
+                                <div className="flex items-center">超额年化 <SortIcon columnKey="excessAnn" sortConfig={sortConfig} /></div>
+                            </th>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('turnover')}>
+                                <div className="flex items-center">换手率 <SortIcon columnKey="turnover" sortConfig={sortConfig} /></div>
+                            </th>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('icMean')}>
+                                <div className="flex items-center">IC 均值 <SortIcon columnKey="icMean" sortConfig={sortConfig} /></div>
+                            </th>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('ir')}>
+                                <div className="flex items-center">IR 值 <SortIcon columnKey="ir" sortConfig={sortConfig} /></div>
+                            </th>
+                            <th className="p-4 text-gray-400">
+                                <div className="flex items-center">波动率 (Vol)</div>
+                            </th>
+                            <th className="p-4 w-24">趋势图</th>
+                        </tr>
+                        </thead>
+                        <tbody className="text-sm divide-y divide-gray-100">
+                        {data.map((row) => (
+                            <tr key={row.id} className="hover:bg-gray-50 transition-colors group">
+                                <td className="p-4 font-serif font-bold text-gray-800 border-l-2 border-transparent hover:border-red-700 transition-all">
+                                    {row.name}
+                                </td>
+                                <td className={`p-4 font-mono font-medium ${getColorClass(row.returnAnn)}`}>
+                                    {row.returnAnn}%
+                                </td>
+                                <td className={`p-4 font-mono ${getColorClass(row.excessAnn)}`}>
+                                    {row.excessAnn}%
+                                </td>
+                                <td className="p-4 font-mono text-gray-600">
+                                    {row.turnover}x
+                                </td>
+                                <td className={`p-4 font-mono font-bold ${getColorClass(row.icMean)}`}>
+                                    {row.icMean}
+                                </td>
+                                <td className="p-4 font-mono text-gray-900 bg-gray-50/50">
+                                    {row.ir}
+                                </td>
+                                <td className="p-4 font-mono text-gray-500">
+                                    {row.volatility}
+                                </td>
+                                <td className="p-4">
+                                    {/* 这里通常放置 Sparkline 小图，此处用 CSS 模拟一条趋势线 */}
+                                    <div className="h-6 w-16 flex items-end gap-0.5 opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '40%'}}></div>
+                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '60%'}}></div>
+                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '30%'}}></div>
+                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '80%'}}></div>
+                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '50%'}}></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* 底部注释 */}
+                <div className="p-4 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex justify-between items-center">
+                    <span>* IC (Information Coefficient) 计算基于 Rank IC; IR = IC Mean / IC Std.</span>
+                    <span>Displaying {data.length} factors</span>
+                </div>
+            </div>
+        </div>
+    );
+}

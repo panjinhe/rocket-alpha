@@ -2,8 +2,8 @@
 'use client';
 
 import { MathJaxContext, MathJax } from "better-react-mathjax";
+import React from "react";
 
-// 官方最新推荐配置（支持 AMS 符号、颜色、完美渲染你的公式）
 const config = {
     loader: { load: ["[tex]/ams", "[tex]/color"] },
     tex: {
@@ -13,24 +13,44 @@ const config = {
     },
 };
 
-// 块级公式（主页大公式专用）
-export const Eq = ({ children }: { children: string }) => (
-    <div className="my-12 text-center text-2xl md:text-3xl leading-relaxed">
-        <MathJax hideUntilTypeset={"first"} dynamic>
-            {children}
-        </MathJax>
-    </div>
-);
+/* ==================== 块级公式 =================== */
+interface EqProps {
+    children: string | React.ReactNode;
+    className?: string;
+}
 
-// 行内公式（可选）
-export const Inline = ({ children }: { children: string }) => (
-    <MathJax inline dynamic>
-        {children}
-    </MathJax>
-);
+export const Eq: React.FC<EqProps> = ({ children, className }) => {
+    const math = React.useMemo(() => String(children).trim(), [children]);
 
-// ！！！最重要：全局只包裹一次！！！
-// 在 app/layout.tsx 里全局包裹一次就够了（不需要每个组件都配 config）
+    return (
+        <div className={`my-12 text-center text-2xl md:text-3xl leading-relaxed ${className ?? ""}`}>
+            <MathJax hideUntilTypeset={"first"} dynamic>
+                {math}
+            </MathJax>
+        </div>
+    );
+};
+
+/* ==================== 行内公式 =================== */
+interface InlineProps {
+    children: string | React.ReactNode;
+    className?: string;
+}
+
+// components/Math.tsx 的 Inline 最终版
+export const Inline: React.FC<InlineProps> = ({ children, className }) => {
+    const raw = String(children).trim();
+
+    const math = raw.startsWith('$') || raw.startsWith('\\(') || raw.startsWith('\\[')
+        ? raw
+        : /[_\^]/.test(raw) || raw.length === 1  // 新增：单个字母也强制数学模式
+            ? `\\(${raw}\\)`
+            : raw;
+
+    return <MathJax inline dynamic className={className}>{math}</MathJax>;
+};
+
+/* ==================== 全局 Provider =================== */
 export const MathProvider = ({ children }: { children: React.ReactNode }) => (
     <MathJaxContext config={config} version={3}>
         {children}

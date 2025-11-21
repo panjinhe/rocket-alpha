@@ -48,7 +48,7 @@ export default function Home() {
                         </div>
                         <p className="text-xs text-gray-500 mt-6 pt-2 border-t border-dashed border-gray-300">最后更新：2025-11-21</p>
                         {/* 链接颜色改为红色 */}
-                        <a href="#" className="inline-block mt-4 font-mono text-sm text-gray-900 hover:text-red-700 border-b border-red-700 pb-px">
+                        <a href="/factor-zoo" className="inline-block mt-4 font-mono text-sm text-gray-900 hover:text-red-700 border-b border-red-700 pb-px">
                             因子风险仪表盘 &rarr;
                         </a>
                     </div>
@@ -56,7 +56,7 @@ export default function Home() {
                     {/* 卡片 2: 模型动物园 (Model Zoo) - 替换原“量化价值” */}
                     <div className="bg-white border border-gray-200 p-8 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg hover:border-gray-300">
                         <div className="flex justify-between items-baseline mb-6 border-b pb-4 border-gray-100">
-                            <h3 className="font-serif text-xl font-bold text-gray-800">模型动物园 Model Zoo</h3>
+                            <h3 className="font-serif text-xl font-bold text-gray-800">（待施工）模型动物园 Model Zoo</h3>
                             {/* 标签颜色改为紫色 */}
                             <span className="font-mono text-xs uppercase text-purple-700 border border-purple-700 px-1 py-0.5 rounded-sm">
                                 集成学习
@@ -87,7 +87,7 @@ export default function Home() {
                     {/* 卡片 3: 基本面量化 (Fundamental Quant) - 替换原“机器学习” */}
                     <div className="bg-white border border-gray-200 p-8 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg hover:border-gray-300">
                         <div className="flex justify-between items-baseline mb-6 border-b pb-4 border-gray-100">
-                            <h3 className="font-serif text-xl font-bold text-gray-800">基本面量化 Fundamental Quant</h3>
+                            <h3 className="font-serif text-xl font-bold text-gray-800">（待施工）基本面量化 Fundamental Quant</h3>
                             {/* 标签颜色改为青色 */}
                             <span className="font-mono text-xs uppercase text-teal-700 border border-teal-700 px-1 py-0.5 rounded-sm">
                                 价值/质量
