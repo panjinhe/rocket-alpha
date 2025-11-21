@@ -1,5 +1,4 @@
 import { PaperCard } from "@/components/PaperCard";
-import { MathBlock } from "@/components/MathBlock";
 import { Eq } from "@/components/Math";
 
 // 假设您的全局CSS已设置了基础字体变量，例如：
@@ -16,11 +15,15 @@ export default function Home() {
                     <p className="text-xl text-gray-600 max-w-xl mx-auto mb-10"> {/* 模拟 .hero-subtitle 样式 */}
                         基于严谨的统计分析与基础经济学逻辑
                     </p>
-                    {/* MathBlock - 模拟 .math-display 样式 */}
-                    <div className="text-2xl mt-8 mb-4 text-gray-700">
-                        {/* 经典的资产定价模型公式 */}
+                    <a
+                        href="/factor-model-explained"   // 就是这个路径
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block group cursor-pointer hover:opacity-80 transition-all duration-300"
+                    >
                         <Eq>{`$$R_{i,t} - R_{f,t} = \\alpha_i + \\sum_{k=1}^K \\beta_k F_{k,t} + \\epsilon_{i,t}$$`}</Eq>
-                    </div>
+                        <p className="text-sm text-gray-500 mt-6 text-center">✦ 点击查看完整符号解释 ✦</p>
+                    </a>
                 </div>
             </section>
 
