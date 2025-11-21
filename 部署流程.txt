@@ -1,0 +1,20 @@
+# 1. 进入项目目录
+/root/rocket-alpha
+
+# 2. 拉取最新代码（如果使用Git）
+git pull origin main
+
+# 3. 安装依赖
+npm install
+
+# 4. 构建项目（如果是Next.js需要构建）
+npm run build
+
+# 5. 重启应用
+pm2 restart rocket-alpha
+
+# 6. 检查应用状态
+pm2 status
+
+# 7. 测试网站
+curl -I http://localhost
