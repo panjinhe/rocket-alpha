@@ -1,0 +1,52 @@
+/* app/globals.css */
+@import "tailwindcss";
+
+/* ============ 1. 全局 CSS 变量（必须放在最前面） ============ */
+:root {
+    --bg-color: #fcfcfc;
+    --surface-color: #ffffff;
+    --primary-text: #2c3e50;
+    --secondary-text: #606c76;
+    --accent-color: #2980b9;
+    --border-color: #e1e4e8;
+}
+
+/* ============ 2. 基础样式（推荐放在 @layer base） ============ */
+@layer base {
+    body {
+        @apply font-sans;                    /* 正确位置 */
+        background-color: var(--bg-color);
+        color: var(--primary-text);
+        line-height: 1.6;
+    }
+
+    /* KaTeX / MathJax 颜色统一 */
+    .MathJax_Display,
+    .katex-display {
+        @apply text-gray-700;
+    }
+}
+
+/* ============ 3. 自定义工具类（必须放在 @layer utilities） ============ */
+@layer utilities {
+    /* 自定义字体栈（去掉 !important，Tailwind v4 会自动处理优先级） */
+    .font-serif {
+        font-family: 'Merriweather', 'Noto Serif SC', 'Songti SC', serif;
+    }
+
+    .font-sans {
+        font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    .font-mono {
+        font-family: 'Roboto Mono', 'JetBrains Mono', 'Fira Code', monospace;
+    }
+}
+
+@layer utilities {
+    .font-sans {
+        font-family: 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont,
+        'Segoe UI', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB',
+        'Microsoft YaHei', sans-serif;
+    }
+}
