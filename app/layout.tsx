@@ -60,7 +60,7 @@ export default function RootLayout({
                                 { name: "研究社区", href: "/" },
                                 { name: "产品咨询", href: "/" },
                                 { name: "数据下载", href: "/download" },
-                                { name: "研究报告", href: "/papers" },
+                                { name: "市场报告", href: "/papers" },
                             ].map((item) => (
                                 <Link
                                     key={item.name}
