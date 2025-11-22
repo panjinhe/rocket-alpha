@@ -1,7 +1,7 @@
 // components/FactorMethodology.tsx
 import React from 'react';
 // 引入 LucideIcon 类型，用于确保 icon props 的类型正确性
-import { Sigma, DollarSign, Shuffle, Zap, BarChart, BookOpen, Layers, LucideIcon } from 'lucide-react';
+import { Sigma, Zap, BarChart, BookOpen, Layers, LucideIcon } from 'lucide-react';
 
 // --- 修复 TS7031 错误：定义 SectionTitle 的 Props 接口 ---
 interface SectionTitleProps {
