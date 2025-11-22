@@ -1,7 +1,7 @@
 import { PaperCard } from "@/components/PaperCard";
 import { Eq } from "@/components/Math";
 // --- 关键修复：导入 lucide-react 中的图标 ---
-import { Activity, TrendingUp } from 'lucide-react';
+import { Activity, TrendingUp, Sparkles, SlidersHorizontal } from 'lucide-react'; // 导入新的图标
 
 // 假设您的全局CSS已设置了基础字体变量，例如：
 // font-serif: Merriweather, Noto Serif SC
@@ -122,31 +122,69 @@ export default function Home() {
                         </a>
                     </div>
 
-                    {/* 卡片 3: 基本面量化 (Fundamental Quant) - 替换原“机器学习” */}
-                    <div className="bg-white border border-gray-200 p-8 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg hover:border-gray-300">
-                        <div className="flex justify-between items-baseline mb-6 border-b pb-4 border-gray-100">
-                            <h3 className="font-serif text-xl font-bold text-gray-800">（待施工）策略动物园 Fundamental Quant</h3>
-                            {/* 标签颜色改为青色 */}
-                            <span className="font-mono text-xs uppercase text-teal-700 border border-teal-700 px-1 py-0.5 rounded-sm">
-                                价值/质量
+                    {/* 卡片 3: 策略动物园 (Strategy Zoo) - 修改后的版本 */}
+                    <div className="bg-white border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-xl rounded-lg">
+                        {/* 标题和头部 */}
+                        <div className="flex justify-between items-center mb-5">
+                            <div className="flex items-center space-x-2">
+                                {/* 使用一个新的图标来代表 "策略" 或 "规则" */}
+                                <SlidersHorizontal className="w-5 h-5 text-gray-900" />
+                                <h3 className="font-serif text-lg font-bold text-gray-900">策略动物园 Strategy Zoo</h3>
+                            </div>
+                            {/* 标签颜色改为青色，样式与卡片一保持一致 */}
+                            <span className="font-mono text-xs uppercase text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-medium">
+                                Portfolio Rules
                             </span>
                         </div>
-                        <div className="text-sm text-gray-700 text-justify mb-4">
-                            融合财务报表分析、管理层质量评估和估值模型，形成高质量投资组合。
+
+                        {/* 核心指标强调区域 (Focus on best/worst performing Strategy) */}
+                        <div className="bg-gray-50 p-4 mb-5 rounded-md border border-gray-100">
+                            <p className="text-xs text-gray-500 uppercase font-mono mb-1">当前最优策略 (Top Performer)</p>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-gray-700">Value Momentum Blend</span>
+                                {/* 使用更大的字体和星星图标来强调优异表现 */}
+                                <span className="flex items-center space-x-1 text-2xl font-bold text-blue-700">
+                                    <Sparkles className="w-5 h-5" />
+                                    <span>+12.5%</span> {/* 假设是近期的月度回报 */}
+                                </span>
+                            </div>
                         </div>
-                        <div className="bg-gray-800 text-gray-300 p-4 rounded-sm font-mono text-xs overflow-x-auto">
-                            {/* 模拟基本面分析终端 - 单引号已转义为 &apos; */}
-                            <pre className="whitespace-pre-wrap">
-                                &gt; ticker = &apos;600519&apos;<br/>
-                                &gt; <span className="text-yellow-400">ROE_Avg5y: 35.8%</span><br/>
-                                &gt; <span className="text-green-400">Valuation_Margin: 20%</span><br/>
-                                &gt; PE_TTM: 30.5<br/>
-                                &gt; <span className="text-red-400">Risk_Score: Low</span>
-                            </pre>
+
+                        {/* 策略列表 */}
+                        <div className="space-y-3 text-sm">
+                            {/* 列表项 - Fundamental Value */}
+                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
+                                <span className="text-gray-600">Fundamental Value</span>
+                                <span className="font-mono text-green-600 font-medium">
+                                    +8.2%
+                                </span>
+                            </div>
+
+                            {/* 列表项 - Quality Growth */}
+                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
+                                <span className="text-gray-600">Quality Growth</span>
+                                <span className="font-mono text-red-600 font-medium">
+                                    -2.1%
+                                </span>
+                            </div>
+
+                            {/* 列表项 - Arbitrage Strategy (新增一个示例) */}
+                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
+                                <span className="text-gray-600">Arbitrage Strategy</span>
+                                <span className="font-mono text-gray-500">
+                                    +0.5%
+                                </span>
+                            </div>
                         </div>
-                        {/* 链接颜色改为青色 */}
-                        <a href="#" className="inline-block mt-4 font-mono text-sm text-gray-900 hover:text-teal-700 border-b border-teal-700 pb-px">
-                            筛选高质量资产 &rarr;
+
+                        {/* 脚注和链接 */}
+                        <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">最后更新：2025-11-20</p>
+                        {/* 链接使用一个突出的按钮样式，引导用户点击，颜色与卡片标签一致 */}
+                        <a
+                            href="/strategy-zoo" // 假设有对应的策略动物园详情页
+                            className="block mt-4 w-full text-center bg-teal-700 text-white py-2 text-sm font-medium rounded-md hover:bg-teal-800 transition-colors shadow-md"
+                        >
+                            探索更多投资策略 &rarr;
                         </a>
                     </div>
 
