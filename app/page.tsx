@@ -81,38 +81,61 @@ export default function Home() {
                             href="/factor-zoo"
                             className="block mt-4 w-full text-center bg-red-700 text-white py-2 text-sm font-medium rounded-md hover:bg-red-800 transition-colors shadow-md"
                         >
-                            进入动物园查看详情 &rarr;
+                            进入因子动物园 &rarr;
                         </a>
                     </div>
 
-                    {/* 卡片 2: 模型动物园 (Model Zoo) - 替换原“量化价值” */}
-                    <div className="bg-white border border-gray-200 p-8 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg hover:border-gray-300">
-                        <div className="flex justify-between items-baseline mb-6 border-b pb-4 border-gray-100">
-                            <h3 className="font-serif text-xl font-bold text-gray-800">（待施工）模型动物园 Model Zoo</h3>
-                            {/* 标签颜色改为紫色 */}
-                            <span className="font-mono text-xs uppercase text-purple-700 border border-purple-700 px-1 py-0.5 rounded-sm">
-                                集成学习
+                    {/* 卡片 2: 模型动物园 (Model Zoo) - 修改为统一模式，稍加区别（如图标、颜色主题、指标单位） */}
+                    <div className="bg-white border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-xl rounded-lg">
+                        {/* 标题和头部 */}
+                        <div className="flex justify-between items-center mb-5">
+                            <div className="flex items-center space-x-2">
+                                <Sparkles className="w-5 h-5 text-gray-900" />
+                                <h3 className="font-serif text-lg font-bold text-gray-900">模型动物园 Model Zoo</h3>
+                            </div>
+                            <span className="font-mono text-xs uppercase text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full font-medium">
+                                Model Perf.
                             </span>
                         </div>
-                        <div className="text-sm text-gray-700 text-justify mb-4">
-                            管理并优化多种预测模型（如 GBDT、LightGBM、LSTM）的预测信号集成。
+
+                        {/* 核心指标强调区域 (Focus on best/worst performing) */}
+                        <div className="bg-gray-50 p-4 mb-5 rounded-md border border-gray-100">
+                            <p className="text-xs text-gray-500 uppercase font-mono mb-1">当前主导模型 (Top Model)</p>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-gray-700">LGBM_V3</span>
+                                <span className="flex items-center space-x-1 text-2xl font-bold text-green-700">
+                                    <TrendingUp className="w-5 h-5" />
+                                    <span>+0.081</span>
+                                </span>
+                            </div>
                         </div>
-                        <div className="bg-gray-50 p-4 rounded-sm font-mono text-xs">
-                            {/* 模型性能表格 */}
-                            <table className="w-full text-left">
-                                <thead className="border-b border-gray-300">
-                                <tr className="text-gray-600"><th>模型</th><th>IC Score</th><th>Rank IC</th></tr>
-                                </thead>
-                                <tbody>
-                                <tr className="h-6"><td>LGBM_V3</td><td>0.081</td><td className="text-green-600">0.095</td></tr>
-                                <tr className="h-6"><td>LSTM_SEQ</td><td>0.065</td><td>0.070</td></tr>
-                                <tr className="h-6"><td>GNN_Alpha</td><td>0.052</td><td className="text-red-600">0.033</td></tr>
-                                </tbody>
-                            </table>
+
+                        {/* 模型性能列表 - 稍加区别：使用 IC Score 作为主要指标，简化为列表 */}
+                        <div className="space-y-3 text-sm">
+                            {/* 列表项 - LSTM_SEQ */}
+                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
+                                <span className="text-gray-600">LSTM_SEQ</span>
+                                <span className="font-mono text-gray-500 font-medium">
+                                    +0.065
+                                </span>
+                            </div>
+
+                            {/* 列表项 - GNN_Alpha */}
+                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
+                                <span className="text-gray-600">GNN_Alpha</span>
+                                <span className="font-mono text-red-600 font-medium">
+                                    +0.052
+                                </span>
+                            </div>
                         </div>
-                        {/* 链接颜色改为紫色 */}
-                        <a href="#" className="inline-block mt-4 font-mono text-sm text-gray-900 hover:text-purple-700 border-b border-purple-700 pb-px">
-                            模型性能监控 &rarr;
+
+                        {/* 脚注和链接 */}
+                        <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">最后更新：2025-11-21</p>
+                        <a
+                            href="/model-zoo"
+                            className="block mt-4 w-full text-center bg-purple-700 text-white py-2 text-sm font-medium rounded-md hover:bg-purple-800 transition-colors shadow-md"
+                        >
+                            进入模型动物园 &rarr;
                         </a>
                     </div>
 
@@ -125,7 +148,7 @@ export default function Home() {
                                 <h3 className="font-serif text-lg font-bold text-gray-900">策略动物园 Strategy Zoo</h3>
                             </div>
                             <span className="font-mono text-xs uppercase text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-medium">
-                                Portfolio Rules
+                                Strat. Perf.
                             </span>
                         </div>
 
@@ -167,7 +190,7 @@ export default function Home() {
                             href="/strategy-zoo" // 假设有对应的策略动物园详情页
                             className="block mt-4 w-full text-center bg-teal-700 text-white py-2 text-sm font-medium rounded-md hover:bg-teal-800 transition-colors shadow-md"
                         >
-                            探索更多投资策略 &rarr;
+                            探索投资策略 &rarr;
                         </a>
                     </div>
 

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Merriweather } from "next/font/google";
 import "./globals.css";
 
-import { ModeToggle } from "@/components/ModeToggle";
 import { MathProvider } from "@/components/Math"; // MathJax 全局 Provider
 import Link from "next/link";
 
@@ -58,9 +57,9 @@ export default function RootLayout({
 
                         <nav className="flex items-center gap-8 text-sm font-medium">
                             {[
-                                { name: "仪表盘", href: "/" },
-                                { name: "量化模型", href: "/models" },
-                                { name: "价值选股", href: "/value" },
+                                { name: "研究社区", href: "/" },
+                                { name: "产品咨询", href: "/" },
+                                { name: "数据下载", href: "/download" },
                                 { name: "研究报告", href: "/papers" },
                             ].map((item) => (
                                 <Link
@@ -71,7 +70,6 @@ export default function RootLayout({
                                     {item.name}
                                 </Link>
                             ))}
-                            <ModeToggle />
                         </nav>
                     </div>
                 </header>
