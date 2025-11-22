@@ -120,9 +120,6 @@ export default function FactorZooContent() {
                     <div>
                         <div className="flex items-center gap-3 mb-2">
                             <h1 className="font-serif text-4xl font-bold text-gray-900">Factor Zoo</h1>
-                            <span className="px-2 py-1 text-xs border border-gray-900 bg-gray-900 text-white font-mono uppercase">
-                                Alpha One
-                            </span>
                         </div>
                         <p className="text-gray-600 font-serif italic">
                             多因子风险与收益全景监控 / 沪深全市场 (A-Share Universe)

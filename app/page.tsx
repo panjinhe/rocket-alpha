@@ -4,8 +4,6 @@ import { Eq } from "@/components/Math";
 import { Activity, TrendingUp, Sparkles, SlidersHorizontal } from 'lucide-react'; // 导入新的图标
 
 // 假设您的全局CSS已设置了基础字体变量，例如：
-// font-serif: Merriweather, Noto Serif SC
-// font-sans: Inter, Noto Sans SC
 
 export default function Home() {
     return (
@@ -18,7 +16,7 @@ export default function Home() {
                         基于严谨的统计分析与基础经济学逻辑
                     </p>
                     <a
-                        href="/factor-model-explained"   // 就是这个路径
+                        href="/factor-model-explained"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block group cursor-pointer hover:opacity-80 transition-all duration-300"
@@ -38,11 +36,9 @@ export default function Home() {
                         {/* 标题和头部 */}
                         <div className="flex justify-between items-center mb-5">
                             <div className="flex items-center space-x-2">
-                                {/* 使用一个图标来代表 "因子" 或 "分析" */}
                                 <Activity className="w-5 h-5 text-gray-900" />
                                 <h3 className="font-serif text-lg font-bold text-gray-900">因子动物园 Factor Zoo</h3>
                             </div>
-                            {/* 标签颜色保持红色，但样式更内敛 */}
                             <span className="font-mono text-xs uppercase text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full font-medium">
                                 Risk Exposure
                             </span>
@@ -53,7 +49,6 @@ export default function Home() {
                             <p className="text-xs text-gray-500 uppercase font-mono mb-1">当前主导因子 (Alpha Drivers)</p>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm font-medium text-gray-700">Momentum</span>
-                                {/* 使用更大的字体和趋势图标来强调主导地位 */}
                                 <span className="flex items-center space-x-1 text-2xl font-bold text-green-700">
                                     <TrendingUp className="w-5 h-5" />
                                     <span>+1.50σ</span>
@@ -82,7 +77,6 @@ export default function Home() {
 
                         {/* 脚注和链接 */}
                         <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">最后更新：2025-11-21</p>
-                        {/* 链接使用一个突出的按钮样式，引导用户点击 */}
                         <a
                             href="/factor-zoo"
                             className="block mt-4 w-full text-center bg-red-700 text-white py-2 text-sm font-medium rounded-md hover:bg-red-800 transition-colors shadow-md"
@@ -127,11 +121,9 @@ export default function Home() {
                         {/* 标题和头部 */}
                         <div className="flex justify-between items-center mb-5">
                             <div className="flex items-center space-x-2">
-                                {/* 使用一个新的图标来代表 "策略" 或 "规则" */}
                                 <SlidersHorizontal className="w-5 h-5 text-gray-900" />
                                 <h3 className="font-serif text-lg font-bold text-gray-900">策略动物园 Strategy Zoo</h3>
                             </div>
-                            {/* 标签颜色改为青色，样式与卡片一保持一致 */}
                             <span className="font-mono text-xs uppercase text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-medium">
                                 Portfolio Rules
                             </span>
@@ -142,10 +134,9 @@ export default function Home() {
                             <p className="text-xs text-gray-500 uppercase font-mono mb-1">当前最优策略 (Top Performer)</p>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm font-medium text-gray-700">Value Momentum Blend</span>
-                                {/* 使用更大的字体和星星图标来强调优异表现 */}
                                 <span className="flex items-center space-x-1 text-2xl font-bold text-blue-700">
                                     <Sparkles className="w-5 h-5" />
-                                    <span>+12.5%</span> {/* 假设是近期的月度回报 */}
+                                    <span>+12.5%</span>
                                 </span>
                             </div>
                         </div>
@@ -168,18 +159,10 @@ export default function Home() {
                                 </span>
                             </div>
 
-                            {/* 列表项 - Arbitrage Strategy (新增一个示例) */}
-                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
-                                <span className="text-gray-600">Arbitrage Strategy</span>
-                                <span className="font-mono text-gray-500">
-                                    +0.5%
-                                </span>
-                            </div>
                         </div>
 
                         {/* 脚注和链接 */}
                         <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">最后更新：2025-11-20</p>
-                        {/* 链接使用一个突出的按钮样式，引导用户点击，颜色与卡片标签一致 */}
                         <a
                             href="/strategy-zoo" // 假设有对应的策略动物园详情页
                             className="block mt-4 w-full text-center bg-teal-700 text-white py-2 text-sm font-medium rounded-md hover:bg-teal-800 transition-colors shadow-md"
