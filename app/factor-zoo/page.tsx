@@ -1,9 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowUp, ArrowDown, ArrowUpDown, Info, TrendingUp, Activity } from 'lucide-react';
+// 引入图标
+import { ArrowUp, ArrowDown, ArrowUpDown, Info, TrendingUp, Activity, FlaskConical, ChevronLeft } from 'lucide-react';
 
-// --- 1. 定义 TypeScript 接口 ---
+// 导入 FactorMethodology 组件
+import FactorMethodology from './FactorMethodology';
+
+// --- 1. 定义 TypeScript 接口 (修改 volatility 为 uniqueAlpha) ---
 
 // 定义单条因子数据的结构
 interface FactorData {
@@ -14,11 +18,11 @@ interface FactorData {
     turnover: string;
     icMean: string;
     ir: string;
-    volatility: string;
+    uniqueAlpha: string; // 新增：因子的独特性指标，衡量方法：Unique Alpha Contribution = (因子IR * (1 - 与基准相关系数)) * 100%，表示因子提供的独特超额收益贡献百分比（越高越独特）
 }
 
 // 定义所有可排序的列键名
-type SortKey = keyof Omit<FactorData, 'id' | 'name' | 'volatility'>;
+type SortKey = keyof Omit<FactorData, 'id' | 'name' | 'uniqueAlpha'>;
 
 // 定义排序配置的结构
 interface SortConfig {
@@ -26,21 +30,19 @@ interface SortConfig {
     direction: 'asc' | 'desc';
 }
 
-// --- 2. 模拟数据 (使用 FactorData 接口) ---
+// --- 2. 模拟数据 (替换 volatility 为 uniqueAlpha) ---
 const initialData: FactorData[] = [
-    { id: 1, name: 'Momentum (动量)', returnAnn: '12.4', excessAnn: '5.2', turnover: '2.5', icMean: '0.06', ir: '1.8', volatility: '15%' },
-    { id: 2, name: 'Value (价值)', returnAnn: '-3.2', excessAnn: '-1.5', turnover: '1.2', icMean: '-0.02', ir: '-0.5', volatility: '12%' },
-    { id: 3, name: 'Size (市值)', returnAnn: '8.1', excessAnn: '2.1', turnover: '0.8', icMean: '0.03', ir: '0.9', volatility: '18%' },
-    { id: 4, name: 'Volatility (波动率)', returnAnn: '-5.4', excessAnn: '-4.2', turnover: '3.0', icMean: '-0.05', ir: '-1.2', volatility: '22%' },
-    { id: 5, name: 'Quality (质量)', returnAnn: '6.5', excessAnn: '1.8', turnover: '1.5', icMean: '0.04', ir: '1.1', volatility: '10%' },
-    { id: 6, name: 'Liquidity (流动性)', returnAnn: '4.2', excessAnn: '0.5', turnover: '4.1', icMean: '0.01', ir: '0.3', volatility: '14%' },
-    { id: 7, name: 'Growth (成长)', returnAnn: '10.1', excessAnn: '3.8', turnover: '2.2', icMean: '0.05', ir: '1.4', volatility: '19%' },
+    { id: 1, name: 'Momentum (动量)', returnAnn: '12.4', excessAnn: '5.2', turnover: '2.5', icMean: '0.06', ir: '1.8', uniqueAlpha: '85%' },
+    { id: 2, name: 'Value (价值)', returnAnn: '-3.2', excessAnn: '-1.5', turnover: '1.2', icMean: '-0.02', ir: '-0.5', uniqueAlpha: '60%' },
+    { id: 3, name: 'Size (市值)', returnAnn: '8.1', excessAnn: '2.1', turnover: '0.8', icMean: '0.03', ir: '0.9', uniqueAlpha: '72%' },
+    { id: 4, name: 'Volatility (波动率)', returnAnn: '-5.4', excessAnn: '-4.2', turnover: '3.0', icMean: '-0.05', ir: '-1.2', uniqueAlpha: '45%' },
+    { id: 5, name: 'Quality (质量)', returnAnn: '6.5', excessAnn: '1.8', turnover: '1.5', icMean: '0.04', ir: '1.1', uniqueAlpha: '78%' },
+    { id: 6, name: 'Liquidity (流动性)', returnAnn: '4.2', excessAnn: '0.5', turnover: '4.1', icMean: '0.01', ir: '0.3', uniqueAlpha: '55%' },
+    { id: 7, name: 'Growth (成长)', returnAnn: '10.1', excessAnn: '3.8', turnover: '2.2', icMean: '0.05', ir: '1.4', uniqueAlpha: '82%' },
 ];
-// 注意：将数值字段中的 '%' 移除，以便于进行浮点数排序
 
-// --- 3. 独立且类型化的工具组件 ---
+// --- 3. 独立且类型化的工具组件 (保持不变) ---
 
-// 修复 TS7031 和 ESLint 错误：将 SortIcon 移出组件，并明确类型
 interface SortIconProps {
     columnKey: SortKey;
     sortConfig: SortConfig;
@@ -53,7 +55,6 @@ const SortIcon = ({ columnKey, sortConfig }: SortIconProps) => {
         : <ArrowDown size={14} className="text-red-700 ml-1" />;
 };
 
-// 修复 TS7006 错误：明确参数类型
 const getColorClass = (valStr: string): string => {
     const val = parseFloat(valStr);
     if (val > 0) return "text-green-700";
@@ -65,13 +66,13 @@ const getColorClass = (valStr: string): string => {
 // --- 4. 主组件 FactorZooContent ---
 export default function FactorZooContent() {
     const [timeRange, setTimeRange] = useState<'1Y' | '3Y'>('1Y');
-    // 使用定义的 SortConfig 接口
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'desc' });
-    // 使用定义的 FactorData 接口
     const [data, setData] = useState<FactorData[]>(initialData);
 
+    // 【新增状态】控制显示哪个页面：'zoo' (主表格) 或 'methodology' (流程说明)
+    const [view, setView] = useState<'zoo' | 'methodology'>('zoo');
 
-    // 修复 TS7006 和 TS7053 错误：明确 key 的类型为 SortKey
+
     const handleSort = (key: SortKey) => {
         let direction: 'asc' | 'desc' = 'desc';
         if (sortConfig.key === key && sortConfig.direction === 'desc') {
@@ -79,9 +80,8 @@ export default function FactorZooContent() {
         }
 
         const sortedData = [...data].sort((a, b) => {
-            // 类型安全的访问：a[key] 的值是字符串，但我们知道它代表一个数字
-            const valA = parseFloat(a[key]); // 修复 TS7053
-            const valB = parseFloat(b[key]); // 修复 TS7053
+            const valA = parseFloat(a[key]);
+            const valB = parseFloat(b[key]);
 
             if (valA < valB) return direction === 'asc' ? -1 : 1;
             if (valA > valB) return direction === 'asc' ? 1 : -1;
@@ -92,17 +92,37 @@ export default function FactorZooContent() {
         setData(sortedData);
     };
 
+    // 【条件渲染】如果当前是方法论视图，则直接渲染 FactorMethodology 组件
+    if (view === 'methodology') {
+        return (
+            <div className="min-h-screen bg-gray-50 p-8 font-sans">
+                <div className="max-w-7xl mx-auto mb-6">
+                    {/* 返回按钮 */}
+                    <button
+                        onClick={() => setView('zoo')}
+                        className="flex items-center text-gray-700 hover:text-red-700 transition-colors mb-4 text-sm font-medium"
+                    >
+                        <ChevronLeft size={16} className="mr-1" /> 返回因子总览
+                    </button>
+                    {/* 导入 FactorMethodology 组件 */}
+                    <FactorMethodology />
+                </div>
+            </div>
+        );
+    }
+
+    // 【默认渲染】主因子总览表格
     return (
         <div className="min-h-screen bg-gray-50 p-8 font-sans">
-            <div className="max-w-7xl mx-auto mb-8">
+            <div className="max-w-7xl mx-auto mb-6">
                 {/* --- 顶部导航区 --- */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-900 pb-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
                             <h1 className="font-serif text-4xl font-bold text-gray-900">Factor Zoo</h1>
                             <span className="px-2 py-1 text-xs border border-gray-900 bg-gray-900 text-white font-mono uppercase">
-                                Alpha One
-                            </span>
+                                Alpha One
+                            </span>
                         </div>
                         <p className="text-gray-600 font-serif italic">
                             多因子风险与收益全景监控 / 沪深全市场 (A-Share Universe)
@@ -132,6 +152,24 @@ export default function FactorZooContent() {
                     </div>
                 </div>
             </div>
+
+            {/* --- 因子计算标准链接栏 (改为按钮和点击事件) --- */}
+            <div className="max-w-7xl mx-auto mb-8">
+                <div
+                    onClick={() => setView('methodology')} // 【关键修改】点击切换到方法论视图
+                    className="flex items-center justify-between p-3 bg-white border border-red-200 text-red-700 shadow-sm hover:shadow-md hover:border-red-300 transition-all cursor-pointer"
+                >
+                    <span className="flex items-center text-sm font-medium gap-3">
+                        <FlaskConical size={18} className="text-red-600" />
+                        <span className="font-serif">多因子指标计算流程说明</span>
+                        <span className="text-gray-500 font-mono text-xs hidden sm:inline-block">/ Methodology & Backtest Standards</span>
+                    </span>
+                    <span className="font-mono text-xs uppercase border border-red-700 px-2 py-0.5 rounded-full hover:bg-red-700 hover:text-white transition-colors">
+                        查看详情
+                    </span>
+                </div>
+            </div>
+            {/* --- 新增栏目结束 --- */}
 
             {/* --- 概览指标卡 (Dashboard Summary) --- */}
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
@@ -174,7 +212,7 @@ export default function FactorZooContent() {
                                 <div className="flex items-center">IR 值 <SortIcon columnKey="ir" sortConfig={sortConfig} /></div>
                             </th>
                             <th className="p-4 text-gray-400">
-                                <div className="flex items-center">波动率 (Vol)</div>
+                                <div className="flex items-center">独特性 (Unique)</div>
                             </th>
                             <th className="p-4 w-24">趋势图</th>
                         </tr>
@@ -200,8 +238,8 @@ export default function FactorZooContent() {
                                 <td className="p-4 font-mono text-gray-900 bg-gray-50/50">
                                     {row.ir}
                                 </td>
-                                <td className="p-4 font-mono text-gray-500">
-                                    {row.volatility}
+                                <td className="p-4 font-mono text-green-700 font-medium">
+                                    {row.uniqueAlpha}
                                 </td>
                                 <td className="p-4">
                                     {/* 这里通常放置 Sparkline 小图，此处用 CSS 模拟一条趋势线 */}
@@ -221,7 +259,7 @@ export default function FactorZooContent() {
 
                 {/* 底部注释 */}
                 <div className="p-4 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex justify-between items-center">
-                    <span>* IC (Information Coefficient) 计算基于 Rank IC; IR = IC Mean / IC Std.</span>
+                    <span>* IC (Information Coefficient) 计算基于 Rank IC; IR = IC Mean / IC Std. Unique Alpha = IR * (1 - |Corr with Benchmark|) * 100%.</span>
                     <span>Displaying {data.length} factors</span>
                 </div>
             </div>

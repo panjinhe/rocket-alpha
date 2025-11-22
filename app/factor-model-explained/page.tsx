@@ -43,7 +43,7 @@ export default function FactorModelExplained() {
 
                     {/* 主标题 */}
                     <h1 className="text-4xl md:text-5xl font-serif font-bold text-center mb-16 text-gray-900 leading-tight">
-                        经典多因子资产定价模型<br className="sm:hidden" />公式完整解读
+                        经典多因子资产定价模型<br className="sm:hidden" />公式解读
                     </h1>
 
                     {/* 核心公式大卡片 */}

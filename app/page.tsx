@@ -125,7 +125,7 @@ export default function Home() {
                     {/* 卡片 3: 基本面量化 (Fundamental Quant) - 替换原“机器学习” */}
                     <div className="bg-white border border-gray-200 p-8 transition-all duration-200 hover:translate-y-[-2px] hover:shadow-lg hover:border-gray-300">
                         <div className="flex justify-between items-baseline mb-6 border-b pb-4 border-gray-100">
-                            <h3 className="font-serif text-xl font-bold text-gray-800">（待施工）基本面量化 Fundamental Quant</h3>
+                            <h3 className="font-serif text-xl font-bold text-gray-800">（待施工）策略动物园 Fundamental Quant</h3>
                             {/* 标签颜色改为青色 */}
                             <span className="font-mono text-xs uppercase text-teal-700 border border-teal-700 px-1 py-0.5 rounded-sm">
                                 价值/质量
