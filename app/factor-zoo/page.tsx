@@ -1,28 +1,43 @@
 // app/factor-zoo/page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 // 引入图标
 import { ArrowUp, ArrowDown, ArrowUpDown, Info, TrendingUp, Activity, FlaskConical, ChevronLeft } from 'lucide-react';
 
-// 导入 FactorMethodology 组件
+// 导入 FactorMethodology 组件 (修复: 显式添加 .tsx 扩展名)
 import FactorMethodology from './FactorMethodology';
 
-// --- 1. 定义 TypeScript 接口 (修改 volatility 为 uniqueAlpha) ---
+// 导入 JSON 数据 (修复: 显式添加 .json 扩展名)
+import data1Y from './data/多空组合因子表现12月_2510.json';
+import data3Y from './data/多空组合因子表现36月_2510.json';
 
-// 定义单条因子数据的结构
-interface FactorData {
-    id: number;
-    name: string;
-    returnAnn: string;
-    excessAnn: string;
-    turnover: string;
-    icMean: string;
-    ir: string;
+
+// --- 1. 定义 TypeScript 接口 ---
+
+// 定义 JSON 原始数据的结构
+interface RawFactorData {
+    "因子名称": string;
+    "多空年化": number;
+    "超额年化": number;
+    "换手率": number;
+    "IC": number;
+    "IR": number;
 }
 
-// 定义所有可排序的列键名
-type SortKey = keyof Omit<FactorData, 'id' | 'name' | 'uniqueAlpha'>;
+// 定义组件内部使用的数据结构
+interface FactorData {
+    id: number;
+    name: string; // 因子名称
+    returnAnn: string; // 多空年化 (已转换为百分比字符串)
+    excessAnn: string; // 超额年化 (已转换为百分比字符串)
+    turnover: string; // 换手率
+    icMean: string; // IC
+    ir: string; // IR
+}
+
+// 定义所有可排序的列键名 (排除 id 和 name)
+type SortKey = keyof Omit<FactorData, 'id' | 'name'>;
 
 // 定义排序配置的结构
 interface SortConfig {
@@ -30,16 +45,24 @@ interface SortConfig {
     direction: 'asc' | 'desc';
 }
 
-// --- 2. 模拟数据 (替换 volatility 为 uniqueAlpha) ---
-const initialData: FactorData[] = [
-    { id: 1, name: 'Momentum (动量)', returnAnn: '12.4', excessAnn: '5.2', turnover: '2.5', icMean: '0.06', ir: '1.8'},
-    { id: 2, name: 'Value (价值)', returnAnn: '-3.2', excessAnn: '-1.5', turnover: '1.2', icMean: '-0.02', ir: '-0.5'},
-    { id: 3, name: 'Size (市值)', returnAnn: '8.1', excessAnn: '2.1', turnover: '0.8', icMean: '0.03', ir: '0.9'},
-    { id: 4, name: 'Volatility (波动率)', returnAnn: '-5.4', excessAnn: '-4.2', turnover: '3.0', icMean: '-0.05', ir: '-1.2'},
-    { id: 5, name: 'Quality (质量)', returnAnn: '6.5', excessAnn: '1.8', turnover: '1.5', icMean: '0.04', ir: '1.1'},
-    { id: 6, name: 'Liquidity (流动性)', returnAnn: '4.2', excessAnn: '0.5', turnover: '4.1', icMean: '0.01', ir: '0.3'},
-    { id: 7, name: 'Growth (成长)', returnAnn: '10.1', excessAnn: '3.8', turnover: '2.2', icMean: '0.05', ir: '1.4'},
-];
+// --- 2. 数据处理函数 ---
+
+// 辅助函数：将原始 JSON 数据映射并格式化为 FactorData
+const mapAndFormatData = (rawData: RawFactorData[]): FactorData[] => {
+    return rawData.map((d, index) => ({
+        id: index + 1,
+        name: d["因子名称"],
+        // 转换为百分比字符串，保留两位小数
+        returnAnn: (d["多空年化"] * 100).toFixed(2),
+        excessAnn: (d["超额年化"] * 100).toFixed(2),
+        // 保留两位小数
+        turnover: d["换手率"].toFixed(2),
+        // IC 保留四位小数
+        icMean: d["IC"].toFixed(4),
+        // IR 保留两位小数
+        ir: d["IR"].toFixed(2),
+    }));
+};
 
 // --- 3. 独立且类型化的工具组件 (保持不变) ---
 
@@ -67,14 +90,49 @@ const getColorClass = (valStr: string): string => {
 export default function FactorZooContent() {
     const [timeRange, setTimeRange] = useState<'1Y' | '3Y'>('1Y');
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: 'desc' });
-    const [data, setData] = useState<FactorData[]>(initialData);
-
-    // 【新增状态】控制显示哪个页面：'zoo' (主表格) 或 'methodology' (流程说明)
+    const [data, setData] = useState<FactorData[]>([]);
     const [view, setView] = useState<'zoo' | 'methodology'>('zoo');
+
+
+    // 使用 useEffect 加载和格式化数据
+    useEffect(() => {
+        // 确保数据类型正确
+        const rawData = timeRange === '1Y' ? (data1Y as RawFactorData[]) : (data3Y as RawFactorData[]);
+        const mappedData = mapAndFormatData(rawData);
+
+        // 应用初始排序或恢复排序
+        if (sortConfig.key) {
+            const sortedData = [...mappedData].sort((a, b) => {
+                const key = sortConfig.key as SortKey;
+                const valA = parseFloat(a[key]);
+                const valB = parseFloat(b[key]);
+
+                if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+            setData(sortedData);
+        } else {
+            // 默认按年化收益率降序排列
+            const defaultSortKey: SortKey = 'returnAnn';
+            const sortedData = [...mappedData].sort((a, b) => {
+                const valA = parseFloat(a[defaultSortKey]);
+                const valB = parseFloat(b[defaultSortKey]);
+
+                if (valA < valB) return 1;
+                if (valA > valB) return -1;
+                return 0;
+            });
+            setSortConfig({ key: defaultSortKey, direction: 'desc' });
+            setData(sortedData);
+        }
+
+    }, [timeRange]);
 
 
     const handleSort = (key: SortKey) => {
         let direction: 'asc' | 'desc' = 'desc';
+        // 如果点击的是同一列，且当前是降序，则切换为升序
         if (sortConfig.key === key && sortConfig.direction === 'desc') {
             direction = 'asc';
         }
@@ -92,7 +150,25 @@ export default function FactorZooContent() {
         setData(sortedData);
     };
 
-    // 【条件渲染】如果当前是方法论视图，则直接渲染 FactorMethodology 组件
+    // 计算概览指标
+    const summaryMetrics = useMemo(() => {
+        if (data.length === 0) return {};
+
+        const bestPerformer = data.reduce((max, d) =>
+            parseFloat(d.returnAnn) > parseFloat(max.returnAnn) ? d : max, data[0]
+        );
+        const highestIC = data.reduce((max, d) =>
+            parseFloat(d.icMean) > parseFloat(max.icMean) ? d : max, data[0]
+        );
+
+        return {
+            bestPerformer,
+            highestIC
+        };
+    }, [data]);
+
+
+    // 【条件渲染】方法论视图
     if (view === 'methodology') {
         return (
             <div className="min-h-screen bg-gray-50 p-8 font-sans">
@@ -131,19 +207,19 @@ export default function FactorZooContent() {
                         <div className="flex bg-white border border-gray-300 rounded-sm p-1 shadow-sm">
                             <button
                                 onClick={() => setTimeRange('1Y')}
-                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '1Y' ? 'bg-gray-100 text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'}`}
+                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '1Y' ? 'bg-red-700 text-white font-bold' : 'text-gray-500 hover:text-gray-900'}`}
                             >
                                 近一年 (1Y)
                             </button>
                             <div className="w-px bg-gray-200 my-1"></div>
                             <button
                                 onClick={() => setTimeRange('3Y')}
-                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '3Y' ? 'bg-gray-100 text-gray-900 font-bold' : 'text-gray-500 hover:text-gray-900'}`}
+                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '3Y' ? 'bg-red-700 text-white font-bold' : 'text-gray-500 hover:text-gray-900'}`}
                             >
                                 近三年 (3Y)
                             </button>
                         </div>
-                        <button className="bg-red-700 text-white px-4 py-2 text-sm font-medium hover:bg-red-800 shadow-sm transition-colors">
+                        <button className="bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-red-800 shadow-sm transition-colors rounded-sm">
                             导出数据 CSV
                         </button>
                     </div>
@@ -154,7 +230,7 @@ export default function FactorZooContent() {
             <div className="max-w-7xl mx-auto mb-8">
                 <div
                     onClick={() => setView('methodology')} // 【关键修改】点击切换到方法论视图
-                    className="flex items-center justify-between p-3 bg-white border border-red-200 text-red-700 shadow-sm hover:shadow-md hover:border-red-300 transition-all cursor-pointer"
+                    className="flex items-center justify-between p-3 bg-white border border-red-200 text-red-700 shadow-sm hover:shadow-md hover:border-red-300 transition-all cursor-pointer rounded-lg"
                 >
                     <span className="flex items-center text-sm font-medium gap-3">
                         <FlaskConical size={18} className="text-red-600" />
@@ -171,47 +247,43 @@ export default function FactorZooContent() {
             {/* --- 概览指标卡 (Dashboard Summary) --- */}
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                 {[
-                    { label: "最佳表现因子", value: "Momentum", sub: "+12.4% Ann.", icon: <TrendingUp size={16}/> },
-                    { label: "最高 IC 均值", value: "Momentum", sub: "0.06 Mean IC", icon: <Activity size={16}/> },
-                    { label: "市场拥挤度", value: "High", sub: "Turnover Spike", icon: <Info size={16}/> },
-                    { label: "数据更新时间", value: "2025-11-21", sub: "Daily Close", icon: null },
+                    { label: "最佳表现因子", value: summaryMetrics.bestPerformer?.name || 'N/A', sub: `${summaryMetrics.bestPerformer?.returnAnn || '0.00'}% Ann.`, icon: <TrendingUp size={16}/>, color: 'border-l-green-600', subColor: 'text-green-700' },
+                    { label: "最高 IC 均值", value: summaryMetrics.highestIC?.name || 'N/A', sub: `${summaryMetrics.highestIC?.icMean || '0.0000'} Mean IC`, icon: <Activity size={16}/>, color: 'border-l-blue-600', subColor: 'text-blue-700' },
+                    { label: "市场拥挤度", value: "High", sub: "Turnover Spike", icon: <Info size={16}/>, color: 'border-l-yellow-600', subColor: 'text-yellow-700' },
+                    { label: "数据时间范围", value: timeRange === '1Y' ? '近一年' : '近三年', sub: `更新至 2025-11-21`, icon: null, color: 'border-l-gray-600', subColor: 'text-gray-500' },
                 ].map((card, idx) => (
-                    <div key={idx} className="bg-white p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-gray-900">
+                    <div key={idx} className={`bg-white p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 ${card.color} rounded-lg`}>
                         <div className="text-xs text-gray-500 uppercase font-mono mb-1 flex items-center gap-2">
                             {card.icon} {card.label}
                         </div>
                         <div className="text-xl font-serif font-bold text-gray-900">{card.value}</div>
-                        <div className={`text-sm font-mono mt-1 ${idx === 0 ? 'text-green-700' : 'text-gray-500'}`}>{card.sub}</div>
+                        <div className={`text-sm font-mono mt-1 ${card.subColor}`}>{card.sub}</div>
                     </div>
                 ))}
             </div>
 
             {/* --- 核心数据表格 --- */}
-            <div className="max-w-7xl mx-auto bg-white border border-gray-200 shadow-lg">
+            <div className="max-w-7xl mx-auto bg-white border border-gray-200 shadow-lg rounded-lg overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
                         <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-medium tracking-wider">
                             <th className="p-4 w-48 font-serif text-gray-900">因子名称 (Factor)</th>
-                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('returnAnn')}>
-                                <div className="flex items-center">年化收益率 <SortIcon columnKey="returnAnn" sortConfig={sortConfig} /></div>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('returnAnn' as SortKey)}>
+                                <div className="flex items-center">年化收益率 (%) <SortIcon columnKey="returnAnn" sortConfig={sortConfig} /></div>
                             </th>
-                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('excessAnn')}>
-                                <div className="flex items-center">超额年化 <SortIcon columnKey="excessAnn" sortConfig={sortConfig} /></div>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('excessAnn' as SortKey)}>
+                                <div className="flex items-center">超额年化 (%) <SortIcon columnKey="excessAnn" sortConfig={sortConfig} /></div>
                             </th>
-                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('turnover')}>
-                                <div className="flex items-center">换手率 <SortIcon columnKey="turnover" sortConfig={sortConfig} /></div>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('turnover' as SortKey)}>
+                                <div className="flex items-center">换手率 (x) <SortIcon columnKey="turnover" sortConfig={sortConfig} /></div>
                             </th>
-                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('icMean')}>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('icMean' as SortKey)}>
                                 <div className="flex items-center">IC 均值 <SortIcon columnKey="icMean" sortConfig={sortConfig} /></div>
                             </th>
-                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('ir')}>
+                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('ir' as SortKey)}>
                                 <div className="flex items-center">IR 值 <SortIcon columnKey="ir" sortConfig={sortConfig} /></div>
                             </th>
-                            <th className="p-4 text-gray-400">
-                                <div className="flex items-center">独特性 (Unique)</div>
-                            </th>
-                            <th className="p-4 w-24">趋势图</th>
                         </tr>
                         </thead>
                         <tbody className="text-sm divide-y divide-gray-100">
@@ -221,29 +293,19 @@ export default function FactorZooContent() {
                                     {row.name}
                                 </td>
                                 <td className={`p-4 font-mono font-medium ${getColorClass(row.returnAnn)}`}>
-                                    {row.returnAnn}%
+                                    {row.returnAnn}
                                 </td>
                                 <td className={`p-4 font-mono ${getColorClass(row.excessAnn)}`}>
-                                    {row.excessAnn}%
+                                    {row.excessAnn}
                                 </td>
                                 <td className="p-4 font-mono text-gray-600">
-                                    {row.turnover}x
+                                    {row.turnover}
                                 </td>
                                 <td className={`p-4 font-mono font-bold ${getColorClass(row.icMean)}`}>
                                     {row.icMean}
                                 </td>
                                 <td className="p-4 font-mono text-gray-900 bg-gray-50/50">
                                     {row.ir}
-                                </td>
-                                <td className="p-4">
-                                    {/* 这里通常放置 Sparkline 小图，此处用 CSS 模拟一条趋势线 */}
-                                    <div className="h-6 w-16 flex items-end gap-0.5 opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all">
-                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '40%'}}></div>
-                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '60%'}}></div>
-                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '30%'}}></div>
-                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '80%'}}></div>
-                                        <div className={`w-1 ${parseFloat(row.returnAnn) > 0 ? 'bg-red-700' : 'bg-green-700'}`} style={{height: '50%'}}></div>
-                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -253,8 +315,8 @@ export default function FactorZooContent() {
 
                 {/* 底部注释 */}
                 <div className="p-4 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex justify-between items-center">
-                    <span>* IC (Information Coefficient) 计算基于 Rank IC; IR = IC Mean / IC Std. Unique Alpha = IR * (1 - |Corr with Benchmark|) * 100%.</span>
-                    <span>Displaying {data.length} factors</span>
+                    <span>* IC (Information Coefficient) 计算基于 Rank IC; IR = IC Mean / IC Std. Unique Alpha (独特性) 暂未计算显示。</span>
+                    <span>显示 {data.length} 个因子 ({timeRange} 数据)</span>
                 </div>
             </div>
         </div>
