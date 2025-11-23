@@ -2,7 +2,6 @@
 import React from 'react';
 // 引入 LucideIcon 类型，用于确保 icon props 的类型正确性
 import { Sigma, Zap, BarChart, BookOpen, Layers, LucideIcon } from 'lucide-react';
-import { renderBoldText } from '../utils/TextRenderer';
 
 interface SectionTitleProps {
     icon: LucideIcon;

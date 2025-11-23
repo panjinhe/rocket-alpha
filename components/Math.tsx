@@ -37,17 +37,20 @@ interface InlineProps {
     className?: string;
 }
 
-// components/Math.tsx 的 Inline 最终版
 export const Inline: React.FC<InlineProps> = ({ children, className }) => {
-    const raw = String(children).trim();
+    // 关键改动：直接把 children 转成字符串后，强制包在 \( ... \) 里
+    // 这样不管原来有没有 $，都不会再出现裸 $ 导致 TS 报错
+    const raw = String(children);
+    const math = raw.trim();
 
-    const math = raw.startsWith('$') || raw.startsWith('\\(') || raw.startsWith('\\[')
-        ? raw
-        : /[_\^]/.test(raw) || raw.length === 1  // 新增：单个字母也强制数学模式
-            ? `\\(${raw}\\)`
-            : raw;
+    // 如果已经自带 $ 或 \( 或 \[，就保持原样；否则强制加上 \(...\)
+    const content = /^\s*(\$\$|\\\[|\\\(|\$)/.test(math) ? math : `\\(${math}\\)`;
 
-    return <MathJax inline dynamic className={className}>{math}</MathJax>;
+    return (
+        <MathJax inline dynamic className={className}>
+            {content}
+        </MathJax>
+    );
 };
 
 /* ==================== 全局 Provider =================== */
