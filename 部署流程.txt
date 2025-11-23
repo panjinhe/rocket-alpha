@@ -1,12 +1,3 @@
-# 杀死所有 Next.js 进程
-pkill -f "next"
-
-# 等待几秒
-sleep 3
-
-# 重新启动服务（在后台运行）
-npm start &
-
 # 1. 进入项目目录
 cd rocket-alpha
 
@@ -28,7 +19,7 @@ pm2 status
 # 7. 测试网站
 curl -I http://localhost
 
-
+cd rocket-alpha
 git pull origin main  # 更新代码
 npm run build  # 重新构建
 pm2 restart rocket-alpha  # 重启应用
