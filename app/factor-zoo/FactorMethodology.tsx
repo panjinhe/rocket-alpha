@@ -2,8 +2,8 @@
 import React from 'react';
 // 引入 LucideIcon 类型，用于确保 icon props 的类型正确性
 import { Sigma, Zap, BarChart, BookOpen, Layers, LucideIcon } from 'lucide-react';
+import { renderBoldText } from '../utils/TextRenderer';
 
-// --- 修复 TS7031 错误：定义 SectionTitle 的 Props 接口 ---
 interface SectionTitleProps {
     icon: LucideIcon;
     title: string;
@@ -11,7 +11,6 @@ interface SectionTitleProps {
     description: React.ReactNode;
 }
 
-// --- SectionTitle 组件定义 (允许 description 渲染 JSX) ---
 const SectionTitle: React.FC<SectionTitleProps> = ({ icon: Icon, title, description }) => (
     <div className="flex items-start mb-4">
         <div className="p-3 bg-red-100 rounded-full mr-4">
@@ -137,7 +136,7 @@ export default function FactorMethodology() {
                     <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
                         {/* 修复加粗 */}
                         <li>{renderBoldText('调仓频率：')} {renderBoldText('月度调仓')} (每月最后一个交易日收盘后)。</li>
-                        <li>{renderBoldText('生成多空组合：')} 股票按因子分数分为 {renderBoldText('5 组 (Quintiles)')}，长仓 Q5，短仓 Q1。</li>
+                        <li>{renderBoldText('生成多空组合：')} 股票按因子分数分为 {renderBoldText('10 组 (Quintiles)')}，长仓 Q10，短仓 Q1。</li>
                         {/* 修复加粗 */}
                         <li>{renderBoldText('权重策略：')} 长仓和短仓均采用 {renderBoldText('等权重 (Equal Weight)')} 策略。</li>
                         <li>{renderBoldText('组合回报：')} 每日/月度净回报 = 长仓回报 - 短仓回报 - 交易成本。</li>

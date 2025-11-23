@@ -77,7 +77,6 @@ export default function RootLayout({
                 {/* Main Content */}
                 <main className="flex-1">{children}</main>
 
-                {/* Footer - 已修改数据来源和添加友情链接 */}
                 <footer className="border-t py-10 text-center text-sm text-muted-foreground">
                     <div className="container mx-auto max-w-7xl px-6">
                         <p>&copy; 2025 Rocket Alpha Research. 所有权利保留。</p>
