@@ -1,18 +1,24 @@
+// app/page.tsx
 import { PaperCard } from "@/components/PaperCard";
 import { Eq } from "@/components/Math";
-// --- 关键修复：导入 lucide-react 中的图标 ---
-import { Activity, TrendingUp, Sparkles, SlidersHorizontal } from 'lucide-react'; // 导入新的图标
+import { Activity, TrendingUp, Sparkles, SlidersHorizontal } from 'lucide-react';
 
-// 假设您的全局CSS已设置了基础字体变量，例如：
+// 关键：导入我们刚创建的共享 Hook
+import { useFactorZooSummary } from '@/lib/useFactorZooSummary';
 
 export default function Home() {
+    // 主页默认展示 3Y 数据（和 factor-zoo 页面保持一致）
+    const factorSummary = useFactorZooSummary('3Y');
+
     return (
         <>
-            {/* Hero 区域 (公式与标语) - 对应 .hero */}
+            {/* Hero 区域 */}
             <section className="py-20 text-center border-b border-gray-200">
-                <div className="container mx-auto max-w-5xl px-8"> {/* 增加左右边距 */}
-                    <h1 className="text-5xl md:text-6xl font-serif font-bold mb-4 text-gray-900">系统化探索 Alpha</h1>
-                    <p className="text-xl text-gray-600 max-w-xl mx-auto mb-10"> {/* 模拟 .hero-subtitle 样式 */}
+                <div className="container mx-auto max-w-5xl px-8">
+                    <h1 className="text-5xl md:text-6xl font-serif font-bold mb-4 text-gray-900">
+                        系统化探索 Alpha
+                    </h1>
+                    <p className="text-xl text-gray-600 max-w-xl mx-auto mb-10">
                         基于严谨的统计分析与基础经济学逻辑
                     </p>
                     <a
@@ -22,186 +28,189 @@ export default function Home() {
                         className="block group cursor-pointer hover:opacity-80 transition-all duration-300"
                     >
                         <Eq>{`$$R_{i,t} - R_{f,t} = \\alpha_i + \\sum_{k=1}^K \\beta_k F_{k,t} + \\epsilon_{i,t}$$`}</Eq>
-                        <p className="text-sm text-gray-500 mt-6 text-center">✦ 点击查看完整符号解释 ✦</p>
+                        <p className="text-sm text-gray-500 mt-6 text-center">
+                            点击查看完整符号解释
+                        </p>
                     </a>
                 </div>
             </section>
 
-            {/* 核心三个板块 - 对应 .modules */}
+            {/* 核心三个板块 */}
             <section className="py-16 container mx-auto max-w-7xl px-8">
                 <div className="grid md:grid-cols-3 gap-8">
 
-                    {/* 卡片 1: 因子动物园 (Factor Zoo) - 重新设计版本 */}
+                    {/* 卡片 1：因子动物园 - 单冠军高亮版 */}
                     <div className="bg-white border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-xl rounded-lg">
-                        {/* 标题和头部 */}
                         <div className="flex justify-between items-center mb-5">
                             <div className="flex items-center space-x-2">
                                 <Activity className="w-5 h-5 text-gray-900" />
-                                <h3 className="font-serif text-lg font-bold text-gray-900">因子动物园 Factor Zoo</h3>
+                                <h3 className="font-serif text-lg font-bold text-gray-900">
+                                    因子动物园 Factor Zoo
+                                </h3>
                             </div>
-                            <span className="font-mono text-xs uppercase text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full font-medium">
-                                Risk Exposure
-                            </span>
+                            <span className="font-mono text-xs uppercase tracking-wider text-red-700 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full font-medium">
+      Alpha Champion
+    </span>
                         </div>
 
-                        {/* 核心指标强调区域 (Focus on best/worst performing) */}
-                        <div className="bg-gray-50 p-4 mb-5 rounded-md border border-gray-100">
-                            <p className="text-xs text-gray-500 uppercase font-mono mb-1">当前主导因子 (Alpha Drivers)</p>
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm font-medium text-gray-700">Momentum</span>
-                                <span className="flex items-center space-x-1 text-2xl font-bold text-green-700">
-                                    <TrendingUp className="w-5 h-5" />
-                                    <span>+1.50σ</span>
-                                </span>
+                        {/* 冠军大高亮 */}
+                        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 p-6 mb-6 border-2 border-amber-300 shadow-lg">
+                            <div className="absolute top-2 right-2">
+                                <span className="text-4xl opacity-20">1st</span>
                             </div>
-                        </div>
-
-                        {/* 因子暴露度列表 */}
-                        <div className="space-y-3 text-sm">
-                            {/* 列表项 - Value */}
-                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
-                                <span className="text-gray-600">Value</span>
-                                <span className="font-mono text-red-600 font-medium">
-                                    -1.00σ
-                                </span>
+                            <p className="text-sm uppercase text-amber-700 font-mono tracking-wider mb-2">
+                                当前最强因子 · 近三年冠军
+                            </p>
+                            <div className="text-2xl font-bold text-gray-900 font-serif leading-tight">
+                                {factorSummary.champion.name}
                             </div>
-
-                            {/* 列表项 - Quality */}
-                            <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
-                                <span className="text-gray-600">Quality</span>
-                                <span className="font-mono text-gray-500">
-                                    +0.20σ
-                                </span>
+                            <div className="mt-3 flex items-end justify-between">
+                                <div className="text-4xl font-bold text-amber-600">
+                                    {factorSummary.champion.return}
+                                </div>
+                            </div>
+                            <div className="mt-2 text-xs text-amber-700 font-mono">
+                                超额年化冠军 · A股全市场多空组合
                             </div>
                         </div>
 
-                        {/* 脚注和链接 */}
-                        <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">最后更新：2025-11-21</p>
+                        {/* 第 2~4 名（小号灰色） */}
+                        <div className="space-y-2.5 text-sm">
+                            {factorSummary.runnersUp.map((item) => (
+                                <div key={item.rank} className="flex justify-between items-center px-1">
+        <span className="text-gray-500 font-mono">
+          <span className="inline-block w-6 text-xs">{item.rank}</span>
+          <span className="text-gray-700 font-medium">{item.name}</span>
+        </span>
+                                    <span className={`font-mono font-medium ${
+                                        item.return.startsWith('+') ? 'text-green-600' : 'text-red-600'
+                                    }`}>
+          {item.return}
+        </span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-6 pt-4 border-t border-gray-100 text-xs text-gray-500">
+                            数据截止至 {factorSummary.lastUpdate}
+                        </div>
+
                         <a
                             href="/factor-zoo"
-                            className="block mt-4 w-full text-center bg-red-700 text-white py-2 text-sm font-medium rounded-md hover:bg-red-800 transition-colors shadow-md"
+                            className="mt-4 block w-full text-center bg-red-700 text-white py-2.5 text-sm font-medium rounded-md hover:bg-red-800 transition-all shadow-md"
                         >
-                            进入因子动物园 &rarr;
+                            进入因子动物园 →
                         </a>
                     </div>
 
-                    {/* 卡片 2: 模型动物园 (Model Zoo) - 修改为统一模式，稍加区别（如图标、颜色主题、指标单位） */}
+                    {/* 卡片 2：模型动物园（暂时保留硬编码，后面也可以改成动态） */}
                     <div className="bg-white border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-xl rounded-lg">
-                        {/* 标题和头部 */}
                         <div className="flex justify-between items-center mb-5">
                             <div className="flex items-center space-x-2">
                                 <Sparkles className="w-5 h-5 text-gray-900" />
-                                <h3 className="font-serif text-lg font-bold text-gray-900">模型动物园 Model Zoo</h3>
+                                <h3 className="font-serif text-lg font-bold text-gray-900">
+                                    模型动物园 Model Zoo
+                                </h3>
                             </div>
                             <span className="font-mono text-xs uppercase text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full font-medium">
-                                Model Perf.
-                            </span>
+                Model Perf.
+              </span>
                         </div>
 
-                        {/* 核心指标强调区域 (Focus on best/worst performing) */}
                         <div className="bg-gray-50 p-4 mb-5 rounded-md border border-gray-100">
-                            <p className="text-xs text-gray-500 uppercase font-mono mb-1">当前主导模型 (Top Model)</p>
+                            <p className="text-xs text-gray-500 uppercase font-mono mb-1">
+                                当前主导模型 (Top Model)
+                            </p>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm font-medium text-gray-700">LGBM_V3</span>
                                 <span className="flex items-center space-x-1 text-2xl font-bold text-green-700">
-                                    <TrendingUp className="w-5 h-5" />
-                                    <span>+0.081</span>
-                                </span>
+                  <TrendingUp className="w-5 h-5" />
+                  <span>+0.081</span>
+                </span>
                             </div>
                         </div>
 
-                        {/* 模型性能列表 - 稍加区别：使用 IC Score 作为主要指标，简化为列表 */}
                         <div className="space-y-3 text-sm">
-                            {/* 列表项 - LSTM_SEQ */}
                             <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
                                 <span className="text-gray-600">LSTM_SEQ</span>
-                                <span className="font-mono text-gray-500 font-medium">
-                                    +0.065
-                                </span>
+                                <span className="font-mono text-gray-500 font-medium">+0.065</span>
                             </div>
-
-                            {/* 列表项 - GNN_Alpha */}
                             <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
                                 <span className="text-gray-600">GNN_Alpha</span>
-                                <span className="font-mono text-red-600 font-medium">
-                                    +0.052
-                                </span>
+                                <span className="font-mono text-red-600 font-medium">+0.052</span>
                             </div>
                         </div>
 
-                        {/* 脚注和链接 */}
-                        <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">最后更新：2025-11-21</p>
+                        <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">
+                            最后更新：2025-11-21
+                        </p>
                         <a
                             href="/model-zoo"
                             className="block mt-4 w-full text-center bg-purple-700 text-white py-2 text-sm font-medium rounded-md hover:bg-purple-800 transition-colors shadow-md"
                         >
-                            进入模型动物园 &rarr;
+                            进入模型动物园 →
                         </a>
                     </div>
 
-                    {/* 卡片 3: 策略动物园 (Strategy Zoo) - 修改后的版本 */}
+                    {/* 卡片 3：策略动物园（同理可后续改动态） */}
                     <div className="bg-white border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-xl rounded-lg">
-                        {/* 标题和头部 */}
                         <div className="flex justify-between items-center mb-5">
                             <div className="flex items-center space-x-2">
                                 <SlidersHorizontal className="w-5 h-5 text-gray-900" />
-                                <h3 className="font-serif text-lg font-bold text-gray-900">策略动物园 Strategy Zoo</h3>
+                                <h3 className="font-serif text-lg font-bold text-gray-900">
+                                    策略动物园 Strategy Zoo
+                                </h3>
                             </div>
                             <span className="font-mono text-xs uppercase text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-medium">
-                                Strat. Perf.
-                            </span>
+                Strat. Perf.
+              </span>
                         </div>
 
-                        {/* 核心指标强调区域 (Focus on best/worst performing Strategy) */}
                         <div className="bg-gray-50 p-4 mb-5 rounded-md border border-gray-100">
-                            <p className="text-xs text-gray-500 uppercase font-mono mb-1">当前最优策略 (Top Performer)</p>
+                            <p className="text-xs text-gray-500 uppercase font-mono mb-1">
+                                当前最优策略 (Top Performer)
+                            </p>
                             <div className="flex justify-between items-center">
-                                <span className="text-sm font-medium text-gray-700">Value Momentum Blend</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Value Momentum Blend
+                </span>
                                 <span className="flex items-center space-x-1 text-2xl font-bold text-blue-700">
-                                    <Sparkles className="w-5 h-5" />
-                                    <span>+12.5%</span>
-                                </span>
+                  <Sparkles className="w-5 h-5" />
+                  <span>+12.5%</span>
+                </span>
                             </div>
                         </div>
 
-                        {/* 策略列表 */}
                         <div className="space-y-3 text-sm">
-                            {/* 列表项 - Fundamental Value */}
                             <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
                                 <span className="text-gray-600">Fundamental Value</span>
-                                <span className="font-mono text-green-600 font-medium">
-                                    +8.2%
-                                </span>
+                                <span className="font-mono text-green-600 font-medium">+8.2%</span>
                             </div>
-
-                            {/* 列表项 - Quality Growth */}
                             <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
                                 <span className="text-gray-600">Quality Growth</span>
-                                <span className="font-mono text-red-600 font-medium">
-                                    -2.1%
-                                </span>
+                                <span className="font-mono text-red-600 font-medium">-2.1%</span>
                             </div>
-
                         </div>
 
-                        {/* 脚注和链接 */}
-                        <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">最后更新：2025-11-20</p>
+                        <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">
+                            最后更新：2025-11-20
+                        </p>
                         <a
-                            href="/strategy-zoo" // 假设有对应的策略动物园详情页
+                            href="/strategy-zoo"
                             className="block mt-4 w-full text-center bg-teal-700 text-white py-2 text-sm font-medium rounded-md hover:bg-teal-800 transition-colors shadow-md"
                         >
-                            探索投资策略 &rarr;
+                            探索投资策略 →
                         </a>
                     </div>
-
                 </div>
             </section>
 
-            {/* 研究洞察 & 经典重温 - 对应 .papers-section */}
+            {/* 经典研究板块（保持不变） */}
             <section className="py-16 border-t border-gray-200 bg-gray-50">
                 <div className="container mx-auto max-w-7xl px-8">
-                    <h2 className="text-center font-serif text-3xl md:text-4xl font-bold mb-12 text-gray-900">经典研究</h2>
-                    {/* PaperCard 列表 - 确保 PaperCard 内部样式适合列表展示 */}
+                    <h2 className="text-center font-serif text-3xl md:text-4xl font-bold mb-12 text-gray-900">
+                        经典研究
+                    </h2>
                     <div className="space-y-0">
                         <PaperCard
                             cnTitle="中国市场的规模因子与价值因子"

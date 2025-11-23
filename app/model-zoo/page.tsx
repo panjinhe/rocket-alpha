@@ -1,3 +1,4 @@
+// app/model-zoo/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -305,19 +306,19 @@ export default function ModelZooPage() {
                                 <td className="p-4 font-mono text-xs text-gray-500">
                                     {row.type}
                                 </td>
-                                <td className={`p-4 font-mono font-medium ${getColorClass('ICMean', row.ICMean)}`}>
+                                <td className={`p-4 font-mono-financial ${getColorClass('ICMean', row.ICMean)}`}>
                                     {row.ICMean}
                                 </td>
-                                <td className={`p-4 font-mono font-bold ${getColorClass('RankIC', row.RankIC)} bg-purple-50/50`}>
+                                <td className={`p-4 font-mono-financial-bold ${getColorClass('RankIC', row.RankIC)} bg-purple-50/50`}>
                                     {row.RankIC}
                                 </td>
-                                <td className={`p-4 font-mono ${getColorClass('IR', row.IR)}`}>
+                                <td className={`p-4 font-mono-financial ${getColorClass('IR', row.IR)}`}>
                                     {row.IR}
                                 </td>
-                                <td className={`p-4 font-mono ${getColorClass('trainLoss', row.trainLoss)}`}>
+                                <td className={`p-4 font-mono-financial ${getColorClass('trainLoss', row.trainLoss)}`}>
                                     {row.trainLoss}
                                 </td>
-                                <td className={`p-4 font-mono ${getColorClass('timeComplexity', row.timeComplexity)}`}>
+                                <td className={`p-4 font-mono-financial ${getColorClass('timeComplexity', row.timeComplexity)}`}>
                                     {row.timeComplexity}ms
                                 </td>
                                 <td className="p-4">

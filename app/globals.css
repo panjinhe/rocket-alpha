@@ -50,3 +50,12 @@
         'Microsoft YaHei', sans-serif;
     }
 }
+
+@layer utilities {
+    .font-mono-financial {
+        font-family: 'JetBrains Mono', 'Fira Code', 'IBM Plex Mono', 'Cascadia Mono',
+        'Consolas', 'Menlo', monospace;
+        font-weight: 600;          /* 直接默认 600 */
+        letter-spacing: 0.5px;
+    }
+}

@@ -241,25 +241,28 @@ export default function FactorZooContent() {
                             </th>
                         </tr>
                         </thead>
+                        {/* 主表格部分 —— 只需要改这里 ↓ */}
                         <tbody className="text-sm divide-y divide-gray-100">
                         {data.map((row) => (
                             <tr key={row.id} className="hover:bg-gray-50 transition-colors group">
                                 <td className="p-4 font-serif font-bold text-gray-800 border-l-2 border-transparent hover:border-red-700 transition-all">
                                     {row.name}
                                 </td>
-                                <td className={`p-4 font-mono font-medium ${getColorClass(row.returnAnn)}`}>
+
+                                {/* 关键修改：所有数字列统一换成 font-mono-financial */}
+                                <td className={`p-4 font-mono-financial ${getColorClass(row.returnAnn)}`}>
                                     {row.returnAnn}
                                 </td>
-                                <td className={`p-4 font-mono ${getColorClass(row.excessAnn)}`}>
+                                <td className={`p-4 font-mono-financial ${getColorClass(row.excessAnn)}`}>
                                     {row.excessAnn}
                                 </td>
-                                <td className="p-4 font-mono text-gray-600">
+                                <td className="p-4 font-mono-financial text-gray-600">
                                     {row.turnover}
                                 </td>
-                                <td className={`p-4 font-mono font-bold ${getColorClass(row.icMean)}`}>
+                                <td className={`p-4 font-mono-financial font-bold ${getColorClass(row.icMean)}`}>
                                     {row.icMean}
                                 </td>
-                                <td className="p-4 font-mono text-gray-900 bg-gray-50/50">
+                                <td className="p-4 font-mono-financial bg-gray-50/50">
                                     {row.ir}
                                 </td>
                             </tr>

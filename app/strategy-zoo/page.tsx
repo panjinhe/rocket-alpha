@@ -1,3 +1,4 @@
+//app/strategy-zoo/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -316,19 +317,19 @@ export default function StrategyZooPage() {
                                 <td className="p-4 font-serif font-bold text-gray-800 border-l-2 border-transparent hover:border-teal-700 transition-all">
                                     {row.name}
                                 </td>
-                                <td className={`p-4 font-mono font-medium ${getColorClass('returnAnn', row.returnAnn)}`}>
+                                <td className={`p-4 font-mono-financial ${getColorClass('returnAnn', row.returnAnn)}`}>
                                     {row.returnAnn}%
                                 </td>
-                                <td className={`p-4 font-mono font-medium ${getColorClass('sharpe', row.sharpe)} bg-teal-50/50`}>
+                                <td className={`p-4 font-mono-financial-bold ${getColorClass('sharpe', row.sharpe)} bg-teal-50/50`}>
                                     {row.sharpe}
                                 </td>
-                                <td className={`p-4 font-mono ${getColorClass('maxDrawdown', row.maxDrawdown)}`}>
+                                <td className={`p-4 font-mono-financial ${getColorClass('maxDrawdown', row.maxDrawdown)}`}>
                                     {row.maxDrawdown}%
                                 </td>
-                                <td className="p-4 font-mono text-gray-600">
+                                <td className="p-4 font-mono-financial text-gray-600">
                                     {row.turnover}x
                                 </td>
-                                <td className="p-4 font-mono text-gray-900">
+                                <td className="p-4 font-mono-financial text-gray-900">
                                     {row.beta}
                                 </td>
                                 <td className="p-4">
