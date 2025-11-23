@@ -1,3 +1,4 @@
+// app/factor-zoo/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -18,7 +19,6 @@ interface FactorData {
     turnover: string;
     icMean: string;
     ir: string;
-    uniqueAlpha: string; // 新增：因子的独特性指标，衡量方法：Unique Alpha Contribution = (因子IR * (1 - 与基准相关系数)) * 100%，表示因子提供的独特超额收益贡献百分比（越高越独特）
 }
 
 // 定义所有可排序的列键名
@@ -32,13 +32,13 @@ interface SortConfig {
 
 // --- 2. 模拟数据 (替换 volatility 为 uniqueAlpha) ---
 const initialData: FactorData[] = [
-    { id: 1, name: 'Momentum (动量)', returnAnn: '12.4', excessAnn: '5.2', turnover: '2.5', icMean: '0.06', ir: '1.8', uniqueAlpha: '85%' },
-    { id: 2, name: 'Value (价值)', returnAnn: '-3.2', excessAnn: '-1.5', turnover: '1.2', icMean: '-0.02', ir: '-0.5', uniqueAlpha: '60%' },
-    { id: 3, name: 'Size (市值)', returnAnn: '8.1', excessAnn: '2.1', turnover: '0.8', icMean: '0.03', ir: '0.9', uniqueAlpha: '72%' },
-    { id: 4, name: 'Volatility (波动率)', returnAnn: '-5.4', excessAnn: '-4.2', turnover: '3.0', icMean: '-0.05', ir: '-1.2', uniqueAlpha: '45%' },
-    { id: 5, name: 'Quality (质量)', returnAnn: '6.5', excessAnn: '1.8', turnover: '1.5', icMean: '0.04', ir: '1.1', uniqueAlpha: '78%' },
-    { id: 6, name: 'Liquidity (流动性)', returnAnn: '4.2', excessAnn: '0.5', turnover: '4.1', icMean: '0.01', ir: '0.3', uniqueAlpha: '55%' },
-    { id: 7, name: 'Growth (成长)', returnAnn: '10.1', excessAnn: '3.8', turnover: '2.2', icMean: '0.05', ir: '1.4', uniqueAlpha: '82%' },
+    { id: 1, name: 'Momentum (动量)', returnAnn: '12.4', excessAnn: '5.2', turnover: '2.5', icMean: '0.06', ir: '1.8'},
+    { id: 2, name: 'Value (价值)', returnAnn: '-3.2', excessAnn: '-1.5', turnover: '1.2', icMean: '-0.02', ir: '-0.5'},
+    { id: 3, name: 'Size (市值)', returnAnn: '8.1', excessAnn: '2.1', turnover: '0.8', icMean: '0.03', ir: '0.9'},
+    { id: 4, name: 'Volatility (波动率)', returnAnn: '-5.4', excessAnn: '-4.2', turnover: '3.0', icMean: '-0.05', ir: '-1.2'},
+    { id: 5, name: 'Quality (质量)', returnAnn: '6.5', excessAnn: '1.8', turnover: '1.5', icMean: '0.04', ir: '1.1'},
+    { id: 6, name: 'Liquidity (流动性)', returnAnn: '4.2', excessAnn: '0.5', turnover: '4.1', icMean: '0.01', ir: '0.3'},
+    { id: 7, name: 'Growth (成长)', returnAnn: '10.1', excessAnn: '3.8', turnover: '2.2', icMean: '0.05', ir: '1.4'},
 ];
 
 // --- 3. 独立且类型化的工具组件 (保持不变) ---
@@ -234,9 +234,6 @@ export default function FactorZooContent() {
                                 </td>
                                 <td className="p-4 font-mono text-gray-900 bg-gray-50/50">
                                     {row.ir}
-                                </td>
-                                <td className="p-4 font-mono text-green-700 font-medium">
-                                    {row.uniqueAlpha}
                                 </td>
                                 <td className="p-4">
                                     {/* 这里通常放置 Sparkline 小图，此处用 CSS 模拟一条趋势线 */}
