@@ -49,8 +49,8 @@ export default function Home() {
                                 </h3>
                             </div>
                             <span className="font-mono text-xs uppercase tracking-wider text-red-700 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full font-medium">
-      Alpha Champion
-    </span>
+            Alpha Champion
+        </span>
                         </div>
 
                         {/* 冠军大高亮 */}
@@ -74,19 +74,23 @@ export default function Home() {
                             </div>
                         </div>
 
-                        {/* 第 2~4 名（小号灰色） */}
+                        {/* 第 2~4 名（使用金融专用等宽字体） */}
                         <div className="space-y-2.5 text-sm">
                             {factorSummary.runnersUp.map((item) => (
                                 <div key={item.rank} className="flex justify-between items-center px-1">
-        <span className="text-gray-500 font-mono">
-          <span className="inline-block w-6 text-xs">{item.rank}</span>
-          <span className="text-gray-700 font-medium">{item.name}</span>
-        </span>
-                                    <span className={`font-mono font-medium ${
+                <span className="text-gray-500">
+                    {/* 排名数字使用金融等宽字体 */}
+                    <span className="inline-block w-6 text-xs font-mono-financial text-gray-900">
+                        {item.rank}
+                    </span>
+                    <span className="text-gray-700 font-medium">{item.name}</span>
+                </span>
+                                    {/* 收益率也使用金融等宽字体 */}
+                                    <span className={`font-mono-financial ${
                                         item.return.startsWith('+') ? 'text-green-600' : 'text-red-600'
                                     }`}>
-          {item.return}
-        </span>
+                    {item.return}
+                </span>
                                 </div>
                             ))}
                         </div>
@@ -103,7 +107,7 @@ export default function Home() {
                         </a>
                     </div>
 
-                    {/* 卡片 2：模型动物园（暂时保留硬编码，后面也可以改成动态） */}
+                    {/* 卡片 2：模型动物园 */}
                     <div className="bg-white border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-xl rounded-lg">
                         <div className="flex justify-between items-center mb-5">
                             <div className="flex items-center space-x-2">
@@ -113,31 +117,35 @@ export default function Home() {
                                 </h3>
                             </div>
                             <span className="font-mono text-xs uppercase text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full font-medium">
-                Model Perf.
-              </span>
+            Model Perf.
+        </span>
                         </div>
 
+                        {/* 当前主导模型 */}
                         <div className="bg-gray-50 p-4 mb-5 rounded-md border border-gray-100">
                             <p className="text-xs text-gray-500 uppercase font-mono mb-1">
                                 当前主导模型 (Top Model)
                             </p>
                             <div className="flex justify-between items-center">
                                 <span className="text-sm font-medium text-gray-700">LGBM_V3</span>
-                                <span className="flex items-center space-x-1 text-2xl font-bold text-green-700">
-                  <TrendingUp className="w-5 h-5" />
-                  <span>+0.081</span>
+                                <span className="flex items-center space-x-1.5">
+                <TrendingUp className="w-6 h-6 text-green-700" />
+                <span className="text-2xl font-bold font-mono-financial text-green-700">
+                    +0.081
                 </span>
+            </span>
                             </div>
                         </div>
 
+                        {/* 第 2、3 名 */}
                         <div className="space-y-3 text-sm">
                             <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
                                 <span className="text-gray-600">LSTM_SEQ</span>
-                                <span className="font-mono text-gray-500 font-medium">+0.065</span>
+                                <span className="font-mono-financial text-green-600">+0.065</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
                                 <span className="text-gray-600">GNN_Alpha</span>
-                                <span className="font-mono text-red-600 font-medium">+0.052</span>
+                                <span className="font-mono-financial text-red-600">+0.052</span>
                             </div>
                         </div>
 
@@ -146,13 +154,13 @@ export default function Home() {
                         </p>
                         <a
                             href="/model-zoo"
-                            className="block mt-4 w-full text-center bg-purple-700 text-white py-2 text-sm font-medium rounded-md hover:bg-purple-800 transition-colors shadow-md"
+                            className="block mt-4 w-full text-center bg-purple-700 text-white py-2.5 text-sm font-medium rounded-md hover:bg-purple-800 transition-colors shadow-md"
                         >
                             进入模型动物园 →
                         </a>
                     </div>
 
-                    {/* 卡片 3：策略动物园（同理可后续改动态） */}
+                    {/* 卡片 3：策略动物园 */}
                     <div className="bg-white border border-gray-200 p-6 shadow-sm transition-all duration-300 hover:shadow-xl rounded-lg">
                         <div className="flex justify-between items-center mb-5">
                             <div className="flex items-center space-x-2">
@@ -162,33 +170,37 @@ export default function Home() {
                                 </h3>
                             </div>
                             <span className="font-mono text-xs uppercase text-teal-700 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded-full font-medium">
-                Strat. Perf.
-              </span>
+            Strat. Perf.
+        </span>
                         </div>
 
+                        {/* 当前最优策略 */}
                         <div className="bg-gray-50 p-4 mb-5 rounded-md border border-gray-100">
                             <p className="text-xs text-gray-500 uppercase font-mono mb-1">
                                 当前最优策略 (Top Performer)
                             </p>
                             <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-700">
-                  Value Momentum Blend
+            <span className="text-sm font-medium text-gray-700">
+                Value Momentum Blend
+            </span>
+                                <span className="flex items-center space-x-1.5">
+                <Sparkles className="w-6 h-6 text-blue-700" />
+                <span className="text-2xl font-bold font-mono-financial text-blue-700">
+                    +12.5%
                 </span>
-                                <span className="flex items-center space-x-1 text-2xl font-bold text-blue-700">
-                  <Sparkles className="w-5 h-5" />
-                  <span>+12.5%</span>
-                </span>
+            </span>
                             </div>
                         </div>
 
+                        {/* 第 2、3 名 */}
                         <div className="space-y-3 text-sm">
                             <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
                                 <span className="text-gray-600">Fundamental Value</span>
-                                <span className="font-mono text-green-600 font-medium">+8.2%</span>
+                                <span className="font-mono-financial text-green-600">+8.2%</span>
                             </div>
                             <div className="flex justify-between items-center pb-2 border-b border-dashed border-gray-100">
                                 <span className="text-gray-600">Quality Growth</span>
-                                <span className="font-mono text-red-600 font-medium">-2.1%</span>
+                                <span className="font-mono-financial text-red-600">-2.1%</span>
                             </div>
                         </div>
 
@@ -197,7 +209,7 @@ export default function Home() {
                         </p>
                         <a
                             href="/strategy-zoo"
-                            className="block mt-4 w-full text-center bg-teal-700 text-white py-2 text-sm font-medium rounded-md hover:bg-teal-800 transition-colors shadow-md"
+                            className="block mt-4 w-full text-center bg-teal-700 text-white py-2.5 text-sm font-medium rounded-md hover:bg-teal-800 transition-colors shadow-md"
                         >
                             探索投资策略 →
                         </a>
