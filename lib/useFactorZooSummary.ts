@@ -1,11 +1,11 @@
 // lib/useFactorZooSummary.ts
 import { useMemo } from 'react';
-import data1Y from '@/app/factor-zoo/data/多空组合因子表现12月_2510.json';
-import data3Y from '@/app/factor-zoo/data/多空组合因子表现36月_2510.json';
+import data1Y from '@/app/factor-zoo/data/因子表现回测12月_2510.json';
+import data3Y from '@/app/factor-zoo/data/因子表现回测36月_2510.json';
 
 interface RawFactor {
     "因子名称": string;
-    "超额年化": number;
+    "多空超额年化": number;
 }
 
 export type TimeRange = '1Y' | '3Y';
@@ -30,7 +30,7 @@ export function useFactorZooSummary(timeRange: TimeRange = '3Y'): FactorSummary 
         const ranked = raw
             .map(f => ({
                 name: f["因子名称"].split('(')[0].trim(),
-                excessAnn: f["超额年化"] * 100,
+                excessAnn: f["多空超额年化"] * 100,
             }))
             .sort((a, b) => b.excessAnn - a.excessAnn);
 

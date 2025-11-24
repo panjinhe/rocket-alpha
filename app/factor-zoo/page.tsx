@@ -5,15 +5,15 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowUp, ArrowDown, ArrowUpDown, Info, TrendingUp, Activity, FlaskConical, ChevronLeft } from 'lucide-react';
 
 import FactorMethodology from './FactorMethodology';
-import data1Y from './data/多空组合因子表现12月_2510.json';
-import data3Y from './data/多空组合因子表现36月_2510.json';
+import data1Y from './data/因子表现回测12月_2510.json';
+import data3Y from './data/因子表现回测36月_2510.json';
 
 // --- 类型定义 ---
 interface RawFactorData {
     "因子名称": string;
     "多空年化": number;
-    "超额年化": number;
-    "换手率": number;
+    "多空超额年化": number;
+    "多空换手": number;
     "IC": number;
     "IR": number;
 }
@@ -61,8 +61,8 @@ const mapAndFormatData = (rawData: RawFactorData[]): FactorData[] => {
         id: index + 1,
         name: d["因子名称"],
         returnAnn: (d["多空年化"] * 100).toFixed(2),
-        excessAnn: (d["超额年化"] * 100).toFixed(2),
-        turnover: d["换手率"].toFixed(2),
+        excessAnn: (d["多空超额年化"] * 100).toFixed(2),
+        turnover: d["多空换手"].toFixed(2),
         icMean: d["IC"].toFixed(4),
         ir: d["IR"].toFixed(2),
     }));
@@ -228,10 +228,10 @@ export default function FactorZooContent() {
                                 <div className="flex items-center">多空年化 (%) <SortIcon columnKey="returnAnn" sortConfig={sortConfig} /></div>
                             </th>
                             <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('excessAnn')}>
-                                <div className="flex items-center">超额年化 (%) <SortIcon columnKey="excessAnn" sortConfig={sortConfig} /></div>
+                                <div className="flex items-center">多空超额年化 (%) <SortIcon columnKey="excessAnn" sortConfig={sortConfig} /></div>
                             </th>
                             <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('turnover')}>
-                                <div className="flex items-center">换手率 <SortIcon columnKey="turnover" sortConfig={sortConfig} /></div>
+                                <div className="flex items-center">多空换手 <SortIcon columnKey="turnover" sortConfig={sortConfig} /></div>
                             </th>
                             <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('icMean')}>
                                 <div className="flex items-center">IC 均值 <SortIcon columnKey="icMean" sortConfig={sortConfig} /></div>
