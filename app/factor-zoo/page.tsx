@@ -2,18 +2,25 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { ArrowUp, ArrowDown, ArrowUpDown, Info, TrendingUp, Activity, FlaskConical, ChevronLeft } from 'lucide-react';
+import { ArrowUp, ArrowDown, ArrowUpDown, Info, TrendingUp, Activity, FlaskConical, ChevronLeft, Layers, LayoutList } from 'lucide-react';
 
 import FactorMethodology from './FactorMethodology';
 import data1Y from './data/因子表现回测12月_2510.json';
 import data3Y from './data/因子表现回测36月_2510.json';
 
-// --- 类型定义 ---
+// --- 1. 类型定义更新 ---
 interface RawFactorData {
     "因子名称": string;
+    // 多空相关
     "多空年化": number;
     "多空超额年化": number;
     "多空换手": number;
+    // 多头/分组相关 (新增)
+    "Q10年化"?: number;
+    "Q1年化"?: number;
+    "Q10换手"?: number;
+    "Q1换手"?: number;
+    // 通用
     "IC": number;
     "IR": number;
 }
@@ -21,9 +28,16 @@ interface RawFactorData {
 interface FactorData {
     id: number;
     name: string;
+    // 多空数据
     returnAnn: string;
     excessAnn: string;
     turnover: string;
+    // 多头数据 (新增)
+    q10Ann: string;
+    q1Ann: string;
+    q10Turnover: string;
+    q1Turnover: string;
+    // 通用数据
     icMean: string;
     ir: string;
 }
@@ -34,6 +48,8 @@ interface SortConfig {
     key: SortKey | null;
     direction: 'asc' | 'desc';
 }
+
+type PortfolioType = 'long_short' | 'long_only'; // 新增组合类型状态
 
 // --- 小组件 ---
 interface SortIconProps {
@@ -55,14 +71,21 @@ const getColorClass = (valStr: string): string => {
     return "text-gray-600";
 };
 
-// --- 数据格式化 ---
+// --- 2. 数据格式化更新 ---
 const mapAndFormatData = (rawData: RawFactorData[]): FactorData[] => {
     return rawData.map((d, index) => ({
         id: index + 1,
         name: d["因子名称"],
+        // 多空
         returnAnn: (d["多空年化"] * 100).toFixed(2),
         excessAnn: (d["多空超额年化"] * 100).toFixed(2),
         turnover: d["多空换手"].toFixed(2),
+        // 多头 (处理可能存在的 undefined，虽然 json 中应该有)
+        q10Ann: d["Q10年化"] ? (d["Q10年化"] * 100).toFixed(2) : "0.00",
+        q1Ann: d["Q1年化"] ? (d["Q1年化"] * 100).toFixed(2) : "0.00",
+        q10Turnover: d["Q10换手"] ? d["Q10换手"].toFixed(2) : "0.00",
+        q1Turnover: d["Q1换手"] ? d["Q1换手"].toFixed(2) : "0.00",
+        // 通用
         icMean: d["IC"].toFixed(4),
         ir: d["IR"].toFixed(2),
     }));
@@ -70,21 +93,19 @@ const mapAndFormatData = (rawData: RawFactorData[]): FactorData[] => {
 
 // --- 主组件 ---
 export default function FactorZooContent() {
-    const [timeRange, setTimeRange] = useState<'1Y' | '3Y'>('3Y'); // 默认 3Y 在前
+    const [timeRange, setTimeRange] = useState<'1Y' | '3Y'>('3Y');
+    const [portfolioType, setPortfolioType] = useState<PortfolioType>('long_only'); // 新增状态
     const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'returnAnn', direction: 'desc' });
     const [data, setData] = useState<FactorData[]>([]);
     const [view, setView] = useState<'zoo' | 'methodology'>('zoo');
 
-    // 1. 选择原始数据
     const rawData = useMemo(() => {
         return timeRange === '1Y' ? (data1Y as RawFactorData[]) : (data3Y as RawFactorData[]);
     }, [timeRange]);
 
-    // 2. 映射 + 排序（核心优化点）
     const processedData = useMemo(() => {
         const mapped = mapAndFormatData(rawData);
 
-        // 先按当前排序规则排序
         if (sortConfig.key) {
             return [...mapped].sort((a, b) => {
                 const valA = parseFloat(a[sortConfig.key!]);
@@ -92,17 +113,15 @@ export default function FactorZooContent() {
                 return sortConfig.direction === 'asc' ? valA - valB : valB - valA;
             });
         }
+        // 默认排序逻辑：如果是多空，按多空年化；如果是多头，按Q10年化
+        const defaultKey = portfolioType === 'long_short' ? 'returnAnn' : 'q10Ann';
+        return [...mapped].sort((a, b) => parseFloat(b[defaultKey]) - parseFloat(a[defaultKey]));
+    }, [rawData, sortConfig, portfolioType]);
 
-        // 无排序配置时默认按年化收益率降序
-        return [...mapped].sort((a, b) => parseFloat(b.returnAnn) - parseFloat(a.returnAnn));
-    }, [rawData, sortConfig]);
-
-    // 3. 仅负责把处理好的数据写入 state（无副作用，无警告）
     useEffect(() => {
         setData(processedData);
     }, [processedData]);
 
-    // 排序点击处理
     const handleSort = (key: SortKey) => {
         const direction =
             sortConfig.key === key && sortConfig.direction === 'desc'
@@ -111,21 +130,23 @@ export default function FactorZooContent() {
         setSortConfig({ key, direction });
     };
 
-    // 概览指标
+    // 概览指标 (根据组合类型动态调整显示的“最佳表现”逻辑)
     const summaryMetrics = useMemo(() => {
         if (data.length === 0) return {};
 
+        // 根据当前视图决定“最佳表现”看哪个字段
+        const returnKey = portfolioType === 'long_short' ? 'returnAnn' : 'q10Ann';
+
         const bestPerformer = data.reduce((max, d) =>
-            parseFloat(d.returnAnn) > parseFloat(max.returnAnn) ? d : max, data[0]
+            parseFloat(d[returnKey]) > parseFloat(max[returnKey]) ? d : max, data[0]
         );
         const highestIC = data.reduce((max, d) =>
             parseFloat(d.icMean) > parseFloat(max.icMean) ? d : max, data[0]
         );
 
-        return { bestPerformer, highestIC };
-    }, [data]);
+        return { bestPerformer, highestIC, returnKey };
+    }, [data, portfolioType]);
 
-    // 方法论视图
     if (view === 'methodology') {
         return (
             <div className="min-h-screen bg-gray-50 p-8 font-sans">
@@ -142,11 +163,10 @@ export default function FactorZooContent() {
         );
     }
 
-    // 主视图
     return (
         <div className="min-h-screen bg-gray-50 p-8 font-sans">
             <div className="max-w-7xl mx-auto mb-6">
-                {/* 标题与时间切换 */}
+                {/* 标题与顶部控制栏 */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-gray-900 pb-6">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
@@ -157,32 +177,67 @@ export default function FactorZooContent() {
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-4 mt-4 md:mt-0">
-                        {/* 3Y 在前，1Y 在后 */}
-                        <div className="flex bg-white border border-gray-300 rounded-sm p-1 shadow-sm">
+                    <div className="flex flex-col items-end gap-3 mt-4 md:mt-0">
+                        {/* 组合类型切换按钮组 - 交换顺序 */}
+                        <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-md">
+                            {/* ← 先渲染多头分组（现在在左边） */}
                             <button
-                                onClick={() => setTimeRange('3Y')}
-                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '3Y' ? 'bg-red-700 text-white font-bold' : 'text-gray-500 hover:text-gray-900'}`}
+                                onClick={() => {
+                                    setPortfolioType('long_only');
+                                    setSortConfig({ key: 'q10Ann', direction: 'desc' });
+                                }}
+                                className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all rounded-sm ${
+                                    portfolioType === 'long_only'
+                                        ? 'bg-white text-blue-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-900'
+                                }`}
                             >
-                                近三年 (3Y)
+                                <LayoutList size={14} /> 多头分组 (Long Only)
                             </button>
-                            <div className="w-px bg-gray-200 my-1"></div>
+
+                            {/* ← 再渲染多空组合（现在在右边） */}
                             <button
-                                onClick={() => setTimeRange('1Y')}
-                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '1Y' ? 'bg-red-700 text-white font-bold' : 'text-gray-500 hover:text-gray-900'}`}
+                                onClick={() => {
+                                    setPortfolioType('long_short');
+                                    setSortConfig({ key: 'returnAnn', direction: 'desc' });
+                                }}
+                                className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-all rounded-sm ${
+                                    portfolioType === 'long_short'
+                                        ? 'bg-white text-red-700 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-900'
+                                }`}
                             >
-                                近一年 (1Y)
+                                <Layers size={14} /> 多空组合 (L/S)
                             </button>
                         </div>
 
-                        <button className="bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-red-800 shadow-sm transition-colors rounded-sm">
-                            导出数据 CSV
-                        </button>
+                        <div className="flex items-center gap-4">
+                            {/* 时间切换 */}
+                            <div className="flex bg-white border border-gray-300 rounded-sm p-1 shadow-sm">
+                                <button
+                                    onClick={() => setTimeRange('3Y')}
+                                    className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '3Y' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-900'}`}
+                                >
+                                    近三年 (3Y)
+                                </button>
+                                <div className="w-px bg-gray-200 my-1"></div>
+                                <button
+                                    onClick={() => setTimeRange('1Y')}
+                                    className={`px-4 py-1.5 text-sm font-medium transition-colors ${timeRange === '1Y' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-900'}`}
+                                >
+                                    近一年 (1Y)
+                                </button>
+                            </div>
+
+                            <button className="bg-white border border-gray-300 text-gray-700 px-4 py-2 text-sm font-medium hover:bg-gray-50 shadow-sm transition-colors rounded-sm">
+                                导出 CSV
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* 方法论入口卡片 */}
+            {/* 方法论入口卡片 (保持不变) */}
             <div className="max-w-7xl mx-auto mb-8">
                 <div
                     onClick={() => setView('methodology')}
@@ -191,7 +246,6 @@ export default function FactorZooContent() {
                     <span className="flex items-center text-sm font-medium gap-3">
                         <FlaskConical size={18} className="text-red-600" />
                         <span className="font-serif">多因子指标计算流程说明</span>
-                        <span className="text-gray-500 font-mono text-xs hidden sm:inline-block">/ Methodology & Backtest Standards</span>
                     </span>
                     <span className="font-mono text-xs uppercase border border-red-700 px-2 py-0.5 rounded-full hover:bg-red-700 hover:text-white transition-colors">
                         查看详情
@@ -202,10 +256,17 @@ export default function FactorZooContent() {
             {/* 概览卡片 */}
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
                 {[
-                    { label: "最佳表现因子", value: summaryMetrics.bestPerformer?.name || 'N/A', sub: `${summaryMetrics.bestPerformer?.returnAnn || '0.00'}% Ann.`, icon: <TrendingUp size={16}/>, color: 'border-l-green-600', subColor: 'text-green-700' },
+                    {
+                        label: portfolioType === 'long_short' ? "最佳 L/S 表现" : "最佳 Q10 表现",
+                        value: summaryMetrics.bestPerformer?.name || 'N/A',
+                        sub: `${summaryMetrics.bestPerformer ? summaryMetrics.bestPerformer[summaryMetrics.returnKey as keyof FactorData] : '0.00'}% Ann.`,
+                        icon: <TrendingUp size={16}/>,
+                        color: 'border-l-green-600',
+                        subColor: 'text-green-700'
+                    },
                     { label: "最高 IC 均值", value: summaryMetrics.highestIC?.name || 'N/A', sub: `${summaryMetrics.highestIC?.icMean || '0.0000'} Mean IC`, icon: <Activity size={16}/>, color: 'border-l-blue-600', subColor: 'text-blue-700' },
-                    { label: "市场拥挤度", value: "High", sub: "Turnover Spike", icon: <Info size={16}/>, color: 'border-l-yellow-600', subColor: 'text-yellow-700' },
-                    { label: "数据时间范围", value: timeRange === '1Y' ? '近一年' : '近三年', sub: `更新至 2025-10-30`, icon: null, color: 'border-l-gray-600', subColor: 'text-gray-500' },
+                    { label: "当前视图", value: portfolioType === 'long_short' ? "多空对冲" : "多头分组", sub: "Portfolio Mode", icon: <Info size={16}/>, color: 'border-l-yellow-600', subColor: 'text-yellow-700' },
+                    { label: "数据范围", value: timeRange === '1Y' ? '近一年' : '近三年', sub: `Samples: ${data.length}`, icon: null, color: 'border-l-gray-600', subColor: 'text-gray-500' },
                 ].map((card, idx) => (
                     <div key={idx} className={`bg-white p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 ${card.color} rounded-lg`}>
                         <div className="text-xs text-gray-500 uppercase font-mono mb-1 flex items-center gap-2">
@@ -223,16 +284,39 @@ export default function FactorZooContent() {
                     <table className="w-full text-left border-collapse">
                         <thead>
                         <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-medium tracking-wider">
-                            <th className="p-4 w-48 font-serif text-gray-900">因子名称 (Factor)</th>
-                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('returnAnn')}>
-                                <div className="flex items-center">多空年化 (%) <SortIcon columnKey="returnAnn" sortConfig={sortConfig} /></div>
-                            </th>
-                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('excessAnn')}>
-                                <div className="flex items-center">多空超额年化 (%) <SortIcon columnKey="excessAnn" sortConfig={sortConfig} /></div>
-                            </th>
-                            <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('turnover')}>
-                                <div className="flex items-center">多空换手 <SortIcon columnKey="turnover" sortConfig={sortConfig} /></div>
-                            </th>
+                            <th className="p-4 w-48 font-serif text-gray-900 sticky left-0 bg-gray-50 z-10 shadow-r-md">因子名称</th>
+
+                            {/* 4. 根据 portfolioType 动态渲染表头 */}
+                            {portfolioType === 'long_short' ? (
+                                <>
+                                    <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('returnAnn')}>
+                                        <div className="flex items-center">多空年化 (%) <SortIcon columnKey="returnAnn" sortConfig={sortConfig} /></div>
+                                    </th>
+                                    <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('excessAnn')}>
+                                        <div className="flex items-center">多空超额年化 (%) <SortIcon columnKey="excessAnn" sortConfig={sortConfig} /></div>
+                                    </th>
+                                    <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('turnover')}>
+                                        <div className="flex items-center">多空换手 <SortIcon columnKey="turnover" sortConfig={sortConfig} /></div>
+                                    </th>
+                                </>
+                            ) : (
+                                <>
+                                    <th className="p-4 cursor-pointer hover:bg-gray-100 group bg-blue-50/30" onClick={() => handleSort('q10Ann')}>
+                                        <div className="flex items-center text-blue-900">Q10 年化 (%) <SortIcon columnKey="q10Ann" sortConfig={sortConfig} /></div>
+                                    </th>
+                                    <th className="p-4 cursor-pointer hover:bg-gray-100 group bg-blue-50/30" onClick={() => handleSort('q1Ann')}>
+                                        <div className="flex items-center text-blue-900">Q1 年化 (%) <SortIcon columnKey="q1Ann" sortConfig={sortConfig} /></div>
+                                    </th>
+                                    <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('q10Turnover')}>
+                                        <div className="flex items-center">Q10 换手 <SortIcon columnKey="q10Turnover" sortConfig={sortConfig} /></div>
+                                    </th>
+                                    <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('q1Turnover')}>
+                                        <div className="flex items-center">Q1 换手 <SortIcon columnKey="q1Turnover" sortConfig={sortConfig} /></div>
+                                    </th>
+                                </>
+                            )}
+
+                            {/* 通用字段 */}
                             <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('icMean')}>
                                 <div className="flex items-center">IC 均值 <SortIcon columnKey="icMean" sortConfig={sortConfig} /></div>
                             </th>
@@ -241,24 +325,44 @@ export default function FactorZooContent() {
                             </th>
                         </tr>
                         </thead>
-                        {/* 主表格部分 —— 只需要改这里 ↓ */}
+
                         <tbody className="text-sm divide-y divide-gray-100">
                         {data.map((row) => (
                             <tr key={row.id} className="hover:bg-gray-50 transition-colors group">
-                                <td className="p-4 font-serif font-bold text-gray-800 border-l-2 border-transparent hover:border-red-700 transition-all">
+                                <td className="p-4 font-serif font-bold text-gray-800 border-l-2 border-transparent hover:border-red-700 transition-all sticky left-0 bg-white group-hover:bg-gray-50 z-10">
                                     {row.name}
                                 </td>
 
-                                {/* 关键修改：所有数字列统一换成 font-mono-financial */}
-                                <td className={`p-4 font-mono-financial ${getColorClass(row.returnAnn)}`}>
-                                    {row.returnAnn}
-                                </td>
-                                <td className={`p-4 font-mono-financial ${getColorClass(row.excessAnn)}`}>
-                                    {row.excessAnn}
-                                </td>
-                                <td className="p-4 font-mono-financial text-gray-600">
-                                    {row.turnover}
-                                </td>
+                                {/* 5. 根据 portfolioType 动态渲染表格内容 */}
+                                {portfolioType === 'long_short' ? (
+                                    <>
+                                        <td className={`p-4 font-mono-financial ${getColorClass(row.returnAnn)}`}>
+                                            {row.returnAnn}
+                                        </td>
+                                        <td className={`p-4 font-mono-financial ${getColorClass(row.excessAnn)}`}>
+                                            {row.excessAnn}
+                                        </td>
+                                        <td className="p-4 font-mono-financial text-gray-600">
+                                            {row.turnover}
+                                        </td>
+                                    </>
+                                ) : (
+                                    <>
+                                        <td className={`p-4 font-mono-financial font-medium bg-blue-50/10 ${getColorClass(row.q10Ann)}`}>
+                                            {row.q10Ann}
+                                        </td>
+                                        <td className={`p-4 font-mono-financial bg-blue-50/10 ${getColorClass(row.q1Ann)}`}>
+                                            {row.q1Ann}
+                                        </td>
+                                        <td className="p-4 font-mono-financial text-gray-600">
+                                            {row.q10Turnover}
+                                        </td>
+                                        <td className="p-4 font-mono-financial text-gray-600">
+                                            {row.q1Turnover}
+                                        </td>
+                                    </>
+                                )}
+
                                 <td className={`p-4 font-mono-financial font-bold ${getColorClass(row.icMean)}`}>
                                     {row.icMean}
                                 </td>
@@ -271,8 +375,13 @@ export default function FactorZooContent() {
                     </table>
                 </div>
 
-                <div className="p-4 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex justify-between items-center">
-                    <span>* IC (Information Coefficient) 计算基于 Rank IC; IR = IC Mean / IC Std. Unique Alpha (独特性) 暂未计算显示。</span>
+                <div className="p-4 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 flex flex-col md:flex-row justify-between items-center gap-2">
+                    <span>
+                        {portfolioType === 'long_short'
+                            ? "* 多空 (Long-Short): 做多Top组 / 做空Bottom组。"
+                            : "* Q10 = Top Group (Factor High), Q1 = Bottom Group (Factor Low)."}
+                        IC 计算基于 Rank IC; IR = IC Mean / IC Std.
+                    </span>
                     <span>显示 {data.length} 个因子 ({timeRange === '1Y' ? '近一年' : '近三年'} 数据)</span>
                 </div>
             </div>
