@@ -225,7 +225,7 @@ export default function FactorZooContent() {
                         <tr className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-medium tracking-wider">
                             <th className="p-4 w-48 font-serif text-gray-900">因子名称 (Factor)</th>
                             <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('returnAnn')}>
-                                <div className="flex items-center">年化收益率 (%) <SortIcon columnKey="returnAnn" sortConfig={sortConfig} /></div>
+                                <div className="flex items-center">多空组合年化 (%) <SortIcon columnKey="returnAnn" sortConfig={sortConfig} /></div>
                             </th>
                             <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('excessAnn')}>
                                 <div className="flex items-center">超额年化 (%) <SortIcon columnKey="excessAnn" sortConfig={sortConfig} /></div>
