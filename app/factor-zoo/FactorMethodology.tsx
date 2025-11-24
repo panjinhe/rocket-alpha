@@ -102,7 +102,7 @@ export default function FactorMethodology() {
                     />
                     <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
                         {/* 修复加粗 */}
-                        <li>{renderBoldText('股票池：')} 沪深 A 股全市场，剔除 ST、退市、{renderBoldText('上市未满 6 个月')} 股票。</li>
+                        <li>{renderBoldText('股票池：')} 沪深 A 股全市场，剔除 ST、退市、{renderBoldText('上市未满 12 个月')} 股票。</li>
                         <li>{renderBoldText('流动性：')} 剔除过去 6 个月日均成交额排名后 10% 的股票。</li>
                         <li>{renderBoldText('数据同步：')} 因子计算基于调仓日 {renderBoldText('前一交易日')} 的收盘数据和最新的已发布财务数据。</li>
                     </ul>
