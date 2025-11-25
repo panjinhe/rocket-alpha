@@ -180,7 +180,6 @@ export default function FactorZooContent() {
                     <div className="flex flex-col items-end gap-3 mt-4 md:mt-0">
                         {/* 组合类型切换按钮组 - 交换顺序 */}
                         <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-md">
-                            {/* ← 先渲染多头分组（现在在左边） */}
                             <button
                                 onClick={() => {
                                     setPortfolioType('long_only');
@@ -192,7 +191,7 @@ export default function FactorZooContent() {
                                         : 'text-gray-500 hover:text-gray-900'
                                 }`}
                             >
-                                <LayoutList size={14} /> 多头分组 (Long Only)
+                                <LayoutList size={14} /> 多头组合 (Long Only)
                             </button>
 
                             {/* ← 再渲染多空组合（现在在右边） */}
@@ -265,7 +264,7 @@ export default function FactorZooContent() {
                         subColor: 'text-green-700'
                     },
                     { label: "最高 IC 均值", value: summaryMetrics.highestIC?.name || 'N/A', sub: `${summaryMetrics.highestIC?.icMean || '0.0000'} Mean IC`, icon: <Activity size={16}/>, color: 'border-l-blue-600', subColor: 'text-blue-700' },
-                    { label: "当前视图", value: portfolioType === 'long_short' ? "多空对冲" : "多头分组", sub: "Portfolio Mode", icon: <Info size={16}/>, color: 'border-l-yellow-600', subColor: 'text-yellow-700' },
+                    { label: "当前视图", value: portfolioType === 'long_short' ? "多空组合" : "多头组合", sub: "Portfolio Mode", icon: <Info size={16}/>, color: 'border-l-yellow-600', subColor: 'text-yellow-700' },
                     { label: "数据范围", value: timeRange === '1Y' ? '近一年' : '近三年', sub: `Samples: ${data.length}`, icon: null, color: 'border-l-gray-600', subColor: 'text-gray-500' },
                 ].map((card, idx) => (
                     <div key={idx} className={`bg-white p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 ${card.color} rounded-lg`}>
