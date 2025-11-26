@@ -1,4 +1,4 @@
-// components/FactorMethodology.tsx
+// app/factor-zoo/FactorMethodology.tsx
 import React from 'react';
 // 引入 LucideIcon 类型，用于确保 icon props 的类型正确性
 import { Sigma, Zap, BarChart, BookOpen, Layers, LucideIcon } from 'lucide-react';
