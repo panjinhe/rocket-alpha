@@ -11,7 +11,7 @@ import { addMonths, subMonths, format, parse } from 'date-fns';
 
 import { StrategyMethodology } from './StrategyMethodology';
 
-// --- 1. 引入新数据 (假设文件名为 策略表现_多周期_2510.json) ---
+// --- 1. 引入新数据
 import multiPeriodData from './data/策略表现_多周期.json';
 
 // --- 2. 定义 TypeScript 接口 ---
@@ -102,12 +102,6 @@ const transformData = (multiPeriodData: RawMultiPeriodData, periodKey: string): 
 
 // 假设所有的回测都截止于 2025 年 10 月 (即 '2025-10')
 const END_DATE_KEY = '2025-10';
-
-/**
- * 根据时间范围返回具体的月份区间字符串。
- * @param timeRange '一年' 或 '三年'
- * @returns 'YYYY-MM 到 YYYY-MM'
- */
 const getPeriodDisplayRange = (timeRange: '一年' | '三年'): string => {
     const endDate = parse(END_DATE_KEY, 'yyyy-MM', new Date());
     let monthsToSubtract = 0;
