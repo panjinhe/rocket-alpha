@@ -31,7 +31,7 @@ export const StrategyMethodology = () => {
                         <li className="flex items-start">
                             <ArrowRight size={14} className="mt-1 mr-2 text-gray-400 flex-shrink-0" />
                             <span>
-                                <strong className="text-gray-900">股票池 (Universe):</strong> 剔除 ST、PT、上市未满 60 天新股及停牌股票。核心股票池为沪深 300 成分股。
+                                <strong className="text-gray-900">股票池 (Universe):</strong> 剔除 ST、PT、上市未满 60 天新股及停牌股票。核心股票池为沪深市场所有股票。
                             </span>
                         </li>
                         <li className="flex items-start">
