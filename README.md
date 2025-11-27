@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pbroe.com - 量化投资研究与实战平台 (Rocket Alpha)
 
-## Getting Started
+## 🚀 项目简介
 
-First, run the development server:
+**Pbroe.com** 是一个专注于**量化投资**的综合性网站，致力于为用户提供系统性地学习、研究和实践量化策略的知识与工具。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+我们的核心目标是通过系统性地展示：
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1.  **因子动物园 (Factor Zoo)**：帮助用户深入理解市场收益的驱动力。
+2.  **策略动物园 (Strategy Zoo)**：提供学习和构建实战化量化交易策略的思路与工具。
+3.  **模型动物园 (Model Zoo)**：探索前沿的机器学习和人工智能在投资中的应用。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+本项目旨在为用户提供理解收益驱动力、构建实战策略并探索前沿机器学习应用的知识与工具。
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**👉 网站已上线，欢迎访问：[pbroe.com](https://www.google.com/search?q=https://pbroe.com)**
 
-## Learn More
+-----
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ 技术栈
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+本项目是使用 [Next.js](https://nextjs.org) 框架和 [`create-next-app`](https://www.google.com/search?q=%5Bhttps://nextjs.org/docs/app/api-reference/cli/create-next-app%5D\(https://nextjs.org/docs/app/api-reference/cli/create-next-app\)) 引导创建的。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **框架**: Next.js
+- **语言**: TypeScript/React
