@@ -5,8 +5,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowUp, ArrowDown, ArrowUpDown, Info, TrendingUp, Activity, FlaskConical, ChevronLeft, Layers, LayoutList } from 'lucide-react';
 
 import FactorMethodology from './FactorMethodology';
-import data1Y from './data/因子表现回测12月_2510.json';
-import data3Y from './data/因子表现回测36月_2510.json';
+import data1Y from './data/因子表现回测12月_2511.json';
+import data3Y from './data/因子表现回测36月_2511.json';
 
 // --- 1. 类型定义更新 ---
 interface RawFactorData {

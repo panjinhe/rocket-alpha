@@ -12,13 +12,6 @@
 
 本项目旨在为用户提供理解收益驱动力、构建实战策略并探索前沿机器学习应用的知识与工具。
 
-**👉 网站已上线，欢迎访问：[pbroe.com](https://www.google.com/search?q=https://pbroe.com)**
+**👉 网站已上线，欢迎访问：[pbroe.com](http://pbroe.com)**
 
 -----
-
-## 🛠️ 技术栈
-
-本项目是使用 [Next.js](https://nextjs.org) 框架和 [`create-next-app`](https://www.google.com/search?q=%5Bhttps://nextjs.org/docs/app/api-reference/cli/create-next-app%5D\(https://nextjs.org/docs/app/api-reference/cli/create-next-app\)) 引导创建的。
-
-- **框架**: Next.js
-- **语言**: TypeScript/React

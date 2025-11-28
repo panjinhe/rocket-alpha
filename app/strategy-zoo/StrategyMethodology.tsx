@@ -133,7 +133,7 @@ export const StrategyMethodology = () => {
             {/* Footer */}
             <div className="bg-gray-50 px-8 py-4 border-t border-gray-200 flex items-center gap-2 text-xs text-gray-500">
                 <Clock size={14} />
-                <span>最后更新时间: 2025-11-25 | 所有的历史回测数据不代表未来表现。</span>
+                <span>最后更新时间: 2025-11-30 | 所有的历史回测数据不代表未来表现。</span>
             </div>
         </div>
     );

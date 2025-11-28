@@ -69,7 +69,7 @@ const cleanAndParse = (str: string): number => {
 /**
  * 将原始嵌套 JSON 数据转换为 StrategyData 数组
  * @param multiPeriodData 原始多周期 JSON 对象
- * @param periodKey 要提取的周期键 ('12个月_2510' 或 '36个月_2510')
+ * @param periodKey 要提取的周期键 ('12个月_2511' 或 '36个月_2511')
  * @returns 转换后的 StrategyData 数组
  */
 const transformData = (multiPeriodData: RawMultiPeriodData, periodKey: string): StrategyData[] => {
@@ -100,8 +100,8 @@ const transformData = (multiPeriodData: RawMultiPeriodData, periodKey: string): 
 
 // --- 4. 工具组件 & 周期计算 (新增周期计算函数) ---
 
-// 假设所有的回测都截止于 2025 年 10 月 (即 '2025-10')
-const END_DATE_KEY = '2025-10';
+// 假设所有的回测都截止于 2025 年 11 月 (即 '2025-11')
+const END_DATE_KEY = '2025-11';
 const getPeriodDisplayRange = (timeRange: '一年' | '三年'): string => {
     const endDate = parse(END_DATE_KEY, 'yyyy-MM', new Date());
     let monthsToSubtract = 0;
@@ -170,9 +170,9 @@ const getColorClass = (key: SortKey, val: number): string => {
 
 // 周期映射工具：修改键名
 const mapTimeRangeToKey = (timeRange: '一年' | '三年'): string => {
-    if (timeRange === '一年') return '12个月_2510';
-    if (timeRange === '三年') return '36个月_2510';
-    return '36个月_2510'; // 默认值
+    if (timeRange === '一年') return '12个月_2511';
+    if (timeRange === '三年') return '36个月_2511';
+    return '36个月_2511'; // 默认值
 }
 
 export default function StrategyZooPage() {

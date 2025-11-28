@@ -1,7 +1,7 @@
 // lib/useFactorZooSummary.ts
 import { useMemo } from 'react';
-import data1Y from '@/app/factor-zoo/data/因子表现回测12月_2510.json';
-import data3Y from '@/app/factor-zoo/data/因子表现回测36月_2510.json';
+import data1Y from '@/app/factor-zoo/data/因子表现回测12月_2511.json';
+import data3Y from '@/app/factor-zoo/data/因子表现回测36月_2511.json';
 
 interface RawFactor {
     "因子名称": string;
@@ -49,7 +49,7 @@ export function useFactorZooSummary(timeRange: TimeRange = '3Y'): FactorSummary 
                 return: format(champion.excessAnn),
             },
             runnersUp,
-            lastUpdate: '2025-11-21',
+            lastUpdate: '2025-11-30',
         };
     }, [timeRange]);
 }

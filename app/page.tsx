@@ -150,7 +150,7 @@ export default function Home() {
                         </div>
 
                         <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">
-                            最后更新：2025-11-21
+                            最后更新：2025-11-30
                         </p>
                         <a
                             href="/model-zoo"
@@ -205,7 +205,7 @@ export default function Home() {
                         </div>
 
                         <p className="text-xs text-gray-500 mt-6 pt-3 border-t border-gray-100">
-                            最后更新：2025-11-20
+                            最后更新：2025-11-30
                         </p>
                         <a
                             href="/strategy-zoo"

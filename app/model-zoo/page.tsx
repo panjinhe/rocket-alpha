@@ -259,7 +259,7 @@ export default function ModelZooPage() {
                     { label: "最优预测能力", value: bestICModel.name, sub: `${bestICModel.RankIC} Rank IC`, icon: <TrendingUp size={16}/>, color: 'border-l-purple-700' },
                     { label: "最低训练损失", value: lowestLossModel.name, sub: `${lowestLossModel.trainLoss} Loss`, icon: <Zap size={16}/>, color: 'border-l-green-700' },
                     { label: "模型健康状态", value: "3 Stable / 1 Degraded", sub: "实时预测延迟 < 10ms", icon: <Activity size={16}/>, color: 'border-l-yellow-700' },
-                    { label: "最新版本", value: "Stacking_Ensemble", sub: "2025-11-21", icon: <GitBranch size={16}/>, color: 'border-l-gray-900' },
+                    { label: "最新版本", value: "Stacking_Ensemble", sub: "2025-11-30", icon: <GitBranch size={16}/>, color: 'border-l-gray-900' },
                 ].map((card, idx) => (
                     <div key={idx} className={`bg-white p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow border-l-4 ${card.color}`}>
                         <div className="text-xs text-gray-500 uppercase font-mono mb-1 flex items-center gap-2">
