@@ -5,15 +5,11 @@
     "totalReturn": 18.12,
     "benchmarkReturn": 0.47,
     "annualizedReturn": 0.1976,
-    "alpha": 0.582,
-    "beta": 0.812,
     "sharpe": 1.987,
     "sortino": 2.336,
     "infoRatio": 2.430,
     "volatility": 0.304,
-    "benchmarkVolatility": 0.240,
     "winRate": 0.602,
-    "dailyWinRate": 0.590,
     "plRatio": 1.628,
     "winCount": 5514,
     "lossCount": 3651,
@@ -293,7 +289,8 @@
     { "date": "2025-10", "code": "000858.SZ", "name": "五粮液", "weight": 1.6, "industry": "食品饮料" },
     { "date": "2025-10", "code": "601888.SH", "name": "中国中免", "weight": 1.4, "industry": "商贸零售" },
     { "date": "2025-10", "code": "300015.SZ", "name": "爱尔眼科", "weight": 1.2, "industry": "医药生物" },
-    { "date": "2025-10", "code": "000001.SZ", "name": "平安银行", "weight": 1.0, "industry": "银行" }
+    { "date": "2025-10", "code": "000001.SZ", "name": "平安银行", "weight": 1.0, "industry": "银行" },
+    { "date": "2025-11", "code": "000001.SZ", "name": "平安银行", "weight": 1.0, "industry": "银行" }
   ],
   "methodology": {
     "description": "本策略旨在捕捉小市值效应与低波动异常。通过对全市场股票进行市值与波动率的双重排序，构建一个风险调整后收益更高的组合。策略核心假设是市场往往低估低波动股票的安全性，同时小市值股票具备更高的成长弹性。",

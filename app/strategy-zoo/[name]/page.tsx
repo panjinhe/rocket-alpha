@@ -22,16 +22,13 @@ interface StrategyDetailedMetrics {
     sortino: number;
     infoRatio: number;
     volatility: number;
-    benchmarkVolatility: number;
     winRate: number;
-    dailyWinRate: number;
     plRatio: number;
     winCount: number;
     lossCount: number;
     maxDrawdown: number;
 }
 
-// [修改] 方法论数据结构：移除 factors，只保留通用描述和逻辑步骤
 interface MethodologyData {
     description: string;
     logic: string[];
@@ -52,20 +49,18 @@ interface CustomTooltipProps {
 interface DailyNavData { date: string; strategy: number; benchmark: number; }
 interface HoldingData { date: string; code: string; name: string; weight: number; industry: string; }
 
-// [修改] 主数据结构包含 methodology
 interface StrategyDetailData {
     id?: string; name: string; description: string;
     metrics: StrategyDetailedMetrics;
     navCurve: DailyNavData[];
     holdings: HoldingData[];
-    methodology?: MethodologyData; // 可选字段
+    methodology?: MethodologyData;
 }
 
-// --- 组件：策略逻辑展示块 (新版 - 无因子列表) ---
+// --- 组件：策略逻辑展示块 ---
 const StrategyLogicCard = ({ data }: { data: MethodologyData }) => {
     return (
         <div className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden ring-1 ring-slate-100 mt-8">
-            {/* 标题栏 */}
             <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <div className="p-1.5 bg-blue-50 rounded-md text-blue-600">
@@ -79,7 +74,6 @@ const StrategyLogicCard = ({ data }: { data: MethodologyData }) => {
             </div>
 
             <div className="p-6 grid grid-cols-1 lg:grid-cols-5 gap-8">
-                {/* 左侧：核心思想 (占 2/5) */}
                 <div className="lg:col-span-2 space-y-4">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                         <Lightbulb size={16} className="text-amber-500" /> 核心逻辑 (Core Logic)
@@ -89,23 +83,17 @@ const StrategyLogicCard = ({ data }: { data: MethodologyData }) => {
                     </div>
                 </div>
 
-                {/* 右侧：执行流程 (占 3/5) */}
                 <div className="lg:col-span-3">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
                         <GitMerge size={16} className="text-teal-500" /> 执行步骤 (Execution Steps)
                     </h3>
-
                     <div className="relative space-y-0">
-                        {/* 左侧连接线 */}
                         <div className="absolute left-3.5 top-2 bottom-4 w-0.5 bg-slate-200"></div>
-
                         {data.logic.map((step, idx) => (
                             <div key={idx} className="relative flex items-start gap-4 pb-6 last:pb-0 group">
-                                {/* 序号节点 */}
                                 <div className="relative z-10 flex-shrink-0 w-8 h-8 rounded-full bg-white border-2 border-slate-200 group-hover:border-teal-500 group-hover:text-teal-600 transition-colors flex items-center justify-center text-slate-400 font-mono text-xs font-bold shadow-sm">
                                     {idx + 1}
                                 </div>
-                                {/* 文本卡片 */}
                                 <div className="flex-1 pt-1">
                                     <p className="text-sm text-slate-700 leading-relaxed group-hover:text-slate-900 transition-colors">
                                         {step}
@@ -120,7 +108,7 @@ const StrategyLogicCard = ({ data }: { data: MethodologyData }) => {
     );
 };
 
-// 1. 定义 MetricCard 的 Props 接口
+// --- 组件：MetricCard ---
 interface MetricCardProps {
     label: string;
     value: string | number;
@@ -129,7 +117,6 @@ interface MetricCardProps {
     trend?: 'up' | 'down' | 'neutral';
 }
 
-// 2. 使用接口替代 any
 const MetricCard = ({
                         label,
                         value,
@@ -142,12 +129,10 @@ const MetricCard = ({
         ${highlight ? 'border-teal-500 shadow-md ring-1 ring-teal-50' : 'border-gray-100'}
     `}>
         {highlight && <div className="absolute top-0 right-0 p-3 opacity-5 text-teal-600"><Activity size={48}/></div>}
-
         <div className="flex justify-between items-start mb-2">
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{label}</div>
             {highlight && <div className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse"></div>}
         </div>
-
         <div className={`text-2xl font-mono-financial tracking-tight ${
             trend === 'up' ? 'text-red-600' :
                 trend === 'down' ? 'text-green-600' :
@@ -155,7 +140,6 @@ const MetricCard = ({
         }`}>
             {value}
         </div>
-
         {subValue && (
             <div className="text-xs text-gray-400 mt-2 font-medium flex items-center gap-1">
                 {subValue}
@@ -164,7 +148,7 @@ const MetricCard = ({
     </div>
 );
 
-// --- 组件：自定义图表 Tooltip (保持不变) ---
+// --- 组件：CustomTooltip ---
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
         return (
@@ -215,10 +199,16 @@ export default function StrategyDetailPage() {
         fetchData();
     }, [strategyName]);
 
+    // [修改] 自动设置最新日期
     useEffect(() => {
         if (data && data.holdings && data.holdings.length > 0) {
-            const uniqueDates = Array.from(new Set(data.holdings.map(h => h.date)));
-            if (uniqueDates.length > 0) setHoldingDate(uniqueDates[0]);
+            // 提取去重后的日期并降序排列 (2025-10, 2025-09...)
+            const sortedDates = Array.from(new Set(data.holdings.map(h => h.date)))
+                .sort((a, b) => b.localeCompare(a)); // 字符串降序
+
+            if (sortedDates.length > 0) {
+                setHoldingDate(sortedDates[0]); // 选中最新的月份
+            }
         }
     }, [data]);
 
@@ -248,7 +238,10 @@ export default function StrategyDetailPage() {
         );
     }
 
-    const availableDates = data.holdings ? Array.from(new Set(data.holdings.map(h => h.date))) : [];
+    // [修改] 获取排序后的可用日期列表
+    const availableDates = data.holdings
+        ? Array.from(new Set(data.holdings.map(h => h.date))).sort((a, b) => b.localeCompare(a))
+        : [];
 
     return (
         <div className="min-h-screen bg-slate-50/50 font-sans pb-20 selection:bg-teal-100 selection:text-teal-900">
@@ -298,12 +291,12 @@ export default function StrategyDetailPage() {
                         <MetricCard label="年化收益" value={`${(data.metrics.annualizedReturn * 100).toFixed(2)}%`} trend="up" />
                         <MetricCard label="Alpha" value={data.metrics.alpha.toFixed(3)} />
                         <MetricCard label="Sharpe Ratio" value={data.metrics.sharpe.toFixed(3)} highlight />
-                        <MetricCard label="最大回撤" value={`${(data.metrics.maxDrawdown).toFixed(2)}%`} trend="down" />
+                        <MetricCard label="最大回撤" value={`${(data.metrics.maxDrawdown * 100).toFixed(2)}%`} trend="down" />
                         <MetricCard label="胜率" value={`${(data.metrics.winRate * 100).toFixed(1)}%`} />
                         <MetricCard label="Beta" value={data.metrics.beta.toFixed(3)} />
                         <MetricCard label="Sortino" value={data.metrics.sortino.toFixed(3)} />
                         <MetricCard label="Info Ratio" value={data.metrics.infoRatio.toFixed(3)} />
-                        <MetricCard label="波动率" value={`${(data.metrics.volatility * 100).toFixed(2)}%`} subValue={`Base: ${(data.metrics.benchmarkVolatility * 100).toFixed(1)}%`} />
+                        <MetricCard label="波动率" value={`${(data.metrics.volatility * 100).toFixed(2)}%`}/>
                         <MetricCard label="盈亏比" value={data.metrics.plRatio.toFixed(3)} />
                         <MetricCard label="盈亏场次" value={`${data.metrics.winCount} / ${data.metrics.lossCount}`} />
                     </div>
@@ -352,7 +345,7 @@ export default function StrategyDetailPage() {
                     </div>
                 </section>
 
-                {/* [新增] 3. 策略构建方法论 */}
+                {/* 3. 策略构建方法论 */}
                 {data.methodology && (
                     <section>
                         <StrategyLogicCard data={data.methodology} />
@@ -368,6 +361,7 @@ export default function StrategyDetailPage() {
                         </div>
                         {availableDates.length > 0 && (
                             <div className="relative">
+                                {/* [修改] value 和 onChange 直接使用排序后的日期字符串 */}
                                 <select value={holdingDate} onChange={(e) => setHoldingDate(e.target.value)} className="appearance-none bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block w-40 p-2.5 pr-8 shadow-sm font-mono-financial cursor-pointer hover:border-teal-400 transition-colors">
                                     {availableDates.map(date => <option key={date} value={date}>{date}</option>)}
                                 </select>
