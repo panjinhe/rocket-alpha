@@ -1,4 +1,4 @@
-// app/strategy-zoo/[id]/page.tsx
+// app/strategy-zoo/[name]/page.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -8,21 +8,35 @@ import {
 } from 'recharts';
 import { ChevronLeft, Activity, TrendingUp, Layers, AlertCircle, Loader2 } from 'lucide-react';
 
-// 定义接口 (如果你没有单独放在 types.ts，就保留在这里)
+// --- 1. 类型定义修改 ---
+// 根据新的 JSON 结构，将原本是 string 的百分比字段改为 number
 interface StrategyDetailedMetrics {
-    totalReturn: string; benchmarkReturn: string; annualizedReturn: string;
-    alpha: number; beta: number; sharpe: number; sortino: number; infoRatio: number;
-    volatility: number; benchmarkVolatility: number; winRate: number; dailyWinRate: number;
-    plRatio: number; winCount: number; lossCount: number; maxDrawdown: string;
+    totalReturn: number;      // 改为 number (例如 18.12)
+    benchmarkReturn: number;  // 改为 number (例如 0.47)
+    annualizedReturn: number; // 改为 number (例如 0.1976)
+    alpha: number;
+    beta: number;
+    sharpe: number;
+    sortino: number;
+    infoRatio: number;
+    volatility: number;
+    benchmarkVolatility: number;
+    winRate: number;
+    dailyWinRate: number;
+    plRatio: number;
+    winCount: number;
+    lossCount: number;
+    maxDrawdown: number;      // 改为 number (例如 47.150)
 }
+
 interface DailyNavData { date: string; strategy: number; benchmark: number; }
 interface HoldingData { date: string; code: string; name: string; weight: number; industry: string; }
 interface StrategyDetailData {
-    id: string; name: string; description: string;
+    id?: string; name: string; description: string;
     metrics: StrategyDetailedMetrics; navCurve: DailyNavData[]; holdings: HoldingData[];
 }
 
-// --- 小组件：指标卡片 ---
+// --- 组件：指标卡片 ---
 const MetricCard = ({ label, value, subValue, highlight = false }: { label: string, value: string | number, subValue?: string, highlight?: boolean }) => (
     <div className={`p-4 bg-white border rounded-sm shadow-sm ${highlight ? 'border-teal-600 border-l-4' : 'border-gray-200'}`}>
         <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
@@ -36,70 +50,69 @@ const MetricCard = ({ label, value, subValue, highlight = false }: { label: stri
 export default function StrategyDetailPage() {
     const params = useParams();
     const router = useRouter();
-    const strategyId = params.id as string;
+
+    const rawName = params.name as string;
+    const strategyName = decodeURIComponent(rawName);
 
     // 状态管理
     const [data, setData] = useState<StrategyDetailData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [holdingDate, setHoldingDate] = useState('2025-10-31');
+    const [holdingDate, setHoldingDate] = useState('');
 
-    // --- 加载数据 ---
+    // --- Effect 1: 加载数据 ---
     useEffect(() => {
         const fetchData = async () => {
-            if (!strategyId) return;
+            if (!strategyName) return;
 
             setLoading(true);
             try {
-                // 请求 public/data/strategies/{id}.json
-                const response = await fetch(`/data/strategies/${strategyId}.json`);
+                // 使用 strategyName 请求 JSON
+                const response = await fetch(`/data/strategies/${strategyName}.json`);
 
                 if (!response.ok) {
-                    throw new Error('未找到该策略的详细数据');
+                    throw new Error(`未找到策略 "${strategyName}" 的详细数据`);
                 }
 
                 const result: StrategyDetailData = await response.json();
                 setData(result);
             } catch (err) {
                 console.error(err);
-                setError('无法加载策略数据，请稍后重试。');
+                setError('无法加载策略数据，请检查文件名是否匹配。');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchData();
-    }, [strategyId]);
+    }, [strategyName]);
 
-    // [修改 2] 当 data 加载成功后，自动设置第一个可用的日期为默认日期
+    // --- Effect 2: 设置默认持仓日期 ---
     useEffect(() => {
-        if (data && data.holdings.length > 0) {
-            // 提取所有不重复的日期
+        if (data && data.holdings && data.holdings.length > 0) {
             const uniqueDates = Array.from(new Set(data.holdings.map(h => h.date)));
-            // 默认选中最新的一个日期 (假设数据按时间排序，或者取第一个)
             if (uniqueDates.length > 0) {
                 setHoldingDate(uniqueDates[0]);
             }
         }
     }, [data]);
 
-    // --- 1. 加载状态视图 ---
+    // --- 视图渲染 ---
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 text-gray-500">
                 <Loader2 size={32} className="animate-spin text-teal-700 mb-2" />
-                <p>正在加载策略详情...</p>
+                <p>正在加载策略: {strategyName}...</p>
             </div>
         );
     }
 
-    // --- 2. 错误状态视图 ---
     if (error || !data) {
         return (
             <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50">
                 <AlertCircle size={48} className="text-red-500 mb-4" />
                 <h2 className="text-xl font-bold text-gray-900 mb-2">数据加载失败</h2>
-                <p className="text-gray-600 mb-6">{error || '未知错误'}</p>
+                <p className="text-gray-600 mb-6">{error}</p>
                 <button
                     onClick={() => router.back()}
                     className="px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 rounded-sm transition-colors"
@@ -110,7 +123,8 @@ export default function StrategyDetailPage() {
         );
     }
 
-    // --- 3. 正常数据视图 ---
+    const availableDates = data.holdings ? Array.from(new Set(data.holdings.map(h => h.date))) : [];
+
     return (
         <div className="min-h-screen bg-gray-50 font-sans pb-20">
             {/* Header */}
@@ -128,7 +142,7 @@ export default function StrategyDetailPage() {
                                 {data.name}
                                 <span className="text-xs font-sans font-normal bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full border border-teal-200">Live</span>
                             </h1>
-                            <p className="text-xs text-gray-500 font-mono">Strategy ID: {data.id}</p>
+                            <p className="text-xs text-gray-500 font-mono">Strategy: {strategyName}</p>
                         </div>
                     </div>
                 </div>
@@ -142,19 +156,57 @@ export default function StrategyDetailPage() {
                         <Activity size={18} className="text-teal-600"/> 核心表现 (Key Metrics)
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        <MetricCard label="累计收益" value={data.metrics.totalReturn} highlight />
-                        <MetricCard label="年化收益" value={data.metrics.annualizedReturn} />
-                        <MetricCard label="Alpha" value={data.metrics.alpha.toFixed(3)} />
-                        <MetricCard label="Sharpe" value={data.metrics.sharpe.toFixed(3)} />
-                        <MetricCard label="最大回撤" value={data.metrics.maxDrawdown} />
-                        <MetricCard label="胜率" value={`${(data.metrics.winRate * 100).toFixed(1)}%`} />
+                        <MetricCard
+                            label="累计收益"
+                            value={`${(data.metrics.totalReturn * 100).toFixed(2)}%`}
+                            highlight
+                        />
+                        <MetricCard
+                            label="年化收益"
+                            value={`${(data.metrics.annualizedReturn * 100).toFixed(2)}%`}
+                        />
+                        <MetricCard
+                            label="Alpha"
+                            value={data.metrics.alpha.toFixed(3)}
+                        />
+                        <MetricCard
+                            label="Sharpe"
+                            value={data.metrics.sharpe.toFixed(3)}
+                        />
+                        <MetricCard
+                            label="最大回撤"
+                            value={`${data.metrics.maxDrawdown.toFixed(2)}%`}
+                        />
+                        <MetricCard
+                            label="胜率"
+                            value={`${(data.metrics.winRate * 100).toFixed(1)}%`}
+                        />
 
-                        <MetricCard label="Beta" value={data.metrics.beta.toFixed(3)} />
-                        <MetricCard label="Sortino" value={data.metrics.sortino.toFixed(3)} />
-                        <MetricCard label="Info Ratio" value={data.metrics.infoRatio.toFixed(3)} />
-                        <MetricCard label="波动率" value={data.metrics.volatility.toFixed(3)} subValue={`基准: ${data.metrics.benchmarkVolatility.toFixed(3)}`} />
-                        <MetricCard label="盈亏比" value={data.metrics.plRatio.toFixed(3)} />
-                        <MetricCard label="盈亏次数" value={`${data.metrics.winCount} / ${data.metrics.lossCount}`} />
+                        <MetricCard
+                            label="Beta"
+                            value={data.metrics.beta.toFixed(3)}
+                        />
+                        <MetricCard
+                            label="Sortino"
+                            value={data.metrics.sortino.toFixed(3)}
+                        />
+                        <MetricCard
+                            label="Info Ratio"
+                            value={data.metrics.infoRatio.toFixed(3)}
+                        />
+                        <MetricCard
+                            label="波动率"
+                            value={`${(data.metrics.volatility * 100).toFixed(2)}%`}
+                            subValue={`基准: ${(data.metrics.benchmarkVolatility * 100).toFixed(2)}%`}
+                        />
+                        <MetricCard
+                            label="盈亏比"
+                            value={data.metrics.plRatio.toFixed(3)}
+                        />
+                        <MetricCard
+                            label="盈亏次数"
+                            value={`${data.metrics.winCount} / ${data.metrics.lossCount}`}
+                        />
                     </div>
                 </section>
 
@@ -227,14 +279,17 @@ export default function StrategyDetailPage() {
                         <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                             <Layers size={18} className="text-teal-600"/> 月末前五大持仓 (Top Holdings)
                         </h2>
-                        {/* 这里如果JSON里包含多个月份，可以通过 filter 动态生成 options */}
-                        <select
-                            value={holdingDate}
-                            onChange={(e) => setHoldingDate(e.target.value)}
-                            className="bg-white border border-gray-300 text-gray-700 text-sm rounded-sm focus:ring-teal-500 focus:border-teal-500 block p-2"
-                        >
-                            <option value="2025-10-31">2025-10-31</option>
-                        </select>
+                        {availableDates.length > 0 && (
+                            <select
+                                value={holdingDate}
+                                onChange={(e) => setHoldingDate(e.target.value)}
+                                className="bg-white border border-gray-300 text-gray-700 text-sm rounded-sm focus:ring-teal-500 focus:border-teal-500 block p-2"
+                            >
+                                {availableDates.map(date => (
+                                    <option key={date} value={date}>{date}</option>
+                                ))}
+                            </select>
+                        )}
                     </div>
 
                     <div className="bg-white border border-gray-200 shadow-sm rounded-sm overflow-hidden">
@@ -249,7 +304,6 @@ export default function StrategyDetailPage() {
                             </tr>
                             </thead>
                             <tbody>
-                            {/* 过滤当前选中日期的持仓 */}
                             {data.holdings
                                 .filter(h => h.date === holdingDate)
                                 .map((stock, idx) => (
@@ -278,9 +332,6 @@ export default function StrategyDetailPage() {
                             )}
                             </tbody>
                         </table>
-                        <div className="p-3 bg-gray-50 border-t border-gray-200 text-xs text-gray-400 text-center">
-                            持仓数据仅供参考，不构成投资建议
-                        </div>
                     </div>
                 </section>
             </div>
