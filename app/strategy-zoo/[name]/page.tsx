@@ -16,8 +16,6 @@ interface StrategyDetailedMetrics {
     totalReturn: number;
     benchmarkReturn: number;
     annualizedReturn: number;
-    alpha: number;
-    beta: number;
     sharpe: number;
     sortino: number;
     infoRatio: number;
@@ -66,7 +64,7 @@ const StrategyLogicCard = ({ data }: { data: MethodologyData }) => {
                     <div className="p-1.5 bg-blue-50 rounded-md text-blue-600">
                         <FileText size={18} />
                     </div>
-                    <h2 className="text-lg font-bold text-slate-800">策略构建方法论</h2>
+                    <h2 className="text-lg font-bold text-slate-800">策略构建方法</h2>
                 </div>
                 <span className="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded">
                     Methodology
@@ -76,7 +74,7 @@ const StrategyLogicCard = ({ data }: { data: MethodologyData }) => {
             <div className="p-6 grid grid-cols-1 lg:grid-cols-5 gap-8">
                 <div className="lg:col-span-2 space-y-4">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                        <Lightbulb size={16} className="text-amber-500" /> 核心逻辑 (Core Logic)
+                        <Lightbulb size={16} className="text-amber-500" /> 核心逻辑
                     </h3>
                     <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 text-sm text-slate-600 leading-relaxed text-justify">
                         {data.description}
@@ -85,7 +83,7 @@ const StrategyLogicCard = ({ data }: { data: MethodologyData }) => {
 
                 <div className="lg:col-span-3">
                     <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-5 flex items-center gap-2">
-                        <GitMerge size={16} className="text-teal-500" /> 执行步骤 (Execution Steps)
+                        <GitMerge size={16} className="text-teal-500" /> 执行步骤
                     </h3>
                     <div className="relative space-y-0">
                         <div className="absolute left-3.5 top-2 bottom-4 w-0.5 bg-slate-200"></div>
@@ -199,12 +197,12 @@ export default function StrategyDetailPage() {
         fetchData();
     }, [strategyName]);
 
-    // [修改] 自动设置最新日期
+    // 自动设置最新日期
     useEffect(() => {
         if (data && data.holdings && data.holdings.length > 0) {
             // 提取去重后的日期并降序排列 (2025-10, 2025-09...)
             const sortedDates = Array.from(new Set(data.holdings.map(h => h.date)))
-                .sort((a, b) => b.localeCompare(a)); // 字符串降序
+                .sort((a, b) => b.localeCompare(a));
 
             if (sortedDates.length > 0) {
                 setHoldingDate(sortedDates[0]); // 选中最新的月份
@@ -238,7 +236,7 @@ export default function StrategyDetailPage() {
         );
     }
 
-    // [修改] 获取排序后的可用日期列表
+    // 获取排序后的可用日期列表
     const availableDates = data.holdings
         ? Array.from(new Set(data.holdings.map(h => h.date))).sort((a, b) => b.localeCompare(a))
         : [];
@@ -280,22 +278,20 @@ export default function StrategyDetailPage() {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-                {/* 1. 核心指标 */}
+                {/* 1. 核心指标 - 修改为一行5个 */}
                 <section>
                     <div className="flex items-center gap-2 mb-5">
                         <div className="p-1.5 bg-indigo-50 rounded-md text-indigo-600"><Activity size={18}/></div>
-                        <h2 className="text-lg font-bold text-slate-800">核心表现分析</h2>
+                        <h2 className="text-lg font-bold text-slate-800">策略表现</h2>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         <MetricCard label="累计收益" value={`${(data.metrics.totalReturn * 100).toFixed(2)}%`} trend={data.metrics.totalReturn > 0 ? 'up' : 'down'} highlight />
                         <MetricCard label="年化收益" value={`${(data.metrics.annualizedReturn * 100).toFixed(2)}%`} trend="up" />
-                        <MetricCard label="Alpha" value={data.metrics.alpha.toFixed(3)} />
-                        <MetricCard label="Sharpe Ratio" value={data.metrics.sharpe.toFixed(3)} highlight />
+                        <MetricCard label="夏普比率" value={data.metrics.sharpe.toFixed(3)} highlight />
                         <MetricCard label="最大回撤" value={`${(data.metrics.maxDrawdown * 100).toFixed(2)}%`} trend="down" />
                         <MetricCard label="胜率" value={`${(data.metrics.winRate * 100).toFixed(1)}%`} />
-                        <MetricCard label="Beta" value={data.metrics.beta.toFixed(3)} />
-                        <MetricCard label="Sortino" value={data.metrics.sortino.toFixed(3)} />
-                        <MetricCard label="Info Ratio" value={data.metrics.infoRatio.toFixed(3)} />
+                        <MetricCard label="索提诺比率" value={data.metrics.sortino.toFixed(3)} />
+                        <MetricCard label="信息比率" value={data.metrics.infoRatio.toFixed(3)} />
                         <MetricCard label="波动率" value={`${(data.metrics.volatility * 100).toFixed(2)}%`}/>
                         <MetricCard label="盈亏比" value={data.metrics.plRatio.toFixed(3)} />
                         <MetricCard label="盈亏场次" value={`${data.metrics.winCount} / ${data.metrics.lossCount}`} />
@@ -345,7 +341,7 @@ export default function StrategyDetailPage() {
                     </div>
                 </section>
 
-                {/* 3. 策略构建方法论 */}
+                {/* 3. 策略构建方法 */}
                 {data.methodology && (
                     <section>
                         <StrategyLogicCard data={data.methodology} />
@@ -361,7 +357,6 @@ export default function StrategyDetailPage() {
                         </div>
                         {availableDates.length > 0 && (
                             <div className="relative">
-                                {/* [修改] value 和 onChange 直接使用排序后的日期字符串 */}
                                 <select value={holdingDate} onChange={(e) => setHoldingDate(e.target.value)} className="appearance-none bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block w-40 p-2.5 pr-8 shadow-sm font-mono-financial cursor-pointer hover:border-teal-400 transition-colors">
                                     {availableDates.map(date => <option key={date} value={date}>{date}</option>)}
                                 </select>

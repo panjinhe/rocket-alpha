@@ -324,7 +324,7 @@ export default function StrategyZooPage() {
                                 <div className="flex items-center">夏普比率 <SortIcon columnKey="sharpe" sortConfig={sortConfig} /></div>
                             </th>
                             <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('maxDrawdown')}>
-                                <div className="flex items-center">最大回撤 <SortIcon columnKey="maxDrawdown" sortConfig={sortConfig} /></div>
+                                <div className="flex items-center">月度最大回撤 <SortIcon columnKey="maxDrawdown" sortConfig={sortConfig} /></div>
                             </th>
                             <th className="p-4 cursor-pointer hover:bg-gray-100 group" onClick={() => handleSort('maxExcessDrawdown')}>
                                 <div className="flex items-center">超额回撤 <SortIcon columnKey="maxExcessDrawdown" sortConfig={sortConfig} /></div>
