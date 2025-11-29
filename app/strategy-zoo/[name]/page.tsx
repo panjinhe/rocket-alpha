@@ -6,9 +6,9 @@ import { useParams, useRouter } from 'next/navigation';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Brush, Area, ComposedChart, ReferenceLine
 } from 'recharts';
-import { ChevronLeft, Activity, TrendingUp, Layers, AlertCircle, Loader2, Calendar, ArrowUpRight, BarChart3, PieChart } from 'lucide-react';
+import { ChevronLeft, Activity, TrendingUp, Layers, AlertCircle, Loader2, Calendar, PieChart } from 'lucide-react';
 
-// --- 类型定义 (保持不变) ---
+// --- 类型定义 ---
 interface StrategyDetailedMetrics {
     totalReturn: number;
     benchmarkReturn: number;
@@ -33,7 +33,6 @@ interface TooltipPayloadItem {
     name: string;
     value: number;
     color: string;
-    // 如果以后需要用到原始数据，可以加一行 payload: any;
 }
 
 // 定义 Tooltip 组件的 Props 结构
@@ -76,7 +75,10 @@ const MetricCard = ({
             {highlight && <div className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse"></div>}
         </div>
 
-        <div className={`text-2xl font-mono font-bold tracking-tight ${
+        {/* [字体修改] 使用 font-mono-financial
+            globals.css 中已定义 font-weight: 600，所以移除了 font-bold 以避免冲突
+        */}
+        <div className={`text-2xl font-mono-financial tracking-tight ${
             trend === 'up' ? 'text-red-600' :
                 trend === 'down' ? 'text-green-600' :
                     highlight ? 'text-teal-700' : 'text-slate-800'
@@ -97,14 +99,14 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-white/95 backdrop-blur-sm border border-slate-200 p-4 rounded-lg shadow-xl text-sm ring-1 ring-black/5">
+                {/* [字体修改] 日期使用 font-mono 以保持对齐 */}
                 <p className="font-mono text-slate-500 mb-2 border-b border-slate-100 pb-1">{label}</p>
-                {/* 这里 TypeScript 现在知道 entry 是 TooltipPayloadItem 类型，不需要再写 entry: any */}
                 {payload.map((entry, index) => (
                     <div key={index} className="flex items-center gap-3 mb-1 min-w-[140px]">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
                         <span className="text-slate-600 font-medium flex-1">{entry.name}</span>
-                        {/* 确保 value 是数字后再 toFixed，增加安全性 */}
-                        <span className="font-mono font-bold text-slate-800">
+                        {/* [字体修改] 数值使用 font-mono-financial */}
+                        <span className="font-mono-financial text-slate-800">
                             {typeof entry.value === 'number' ? entry.value.toFixed(4) : entry.value}
                         </span>
                     </div>
@@ -185,6 +187,7 @@ export default function StrategyDetailPage() {
     const availableDates = data.holdings ? Array.from(new Set(data.holdings.map(h => h.date))) : [];
 
     return (
+        // [字体修改] 全局使用 font-sans (Inter/System)
         <div className="min-h-screen bg-slate-50/50 font-sans pb-20 selection:bg-teal-100 selection:text-teal-900">
             {/* Header with Gradient Background */}
             <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-slate-200/60 shadow-sm supports-[backdrop-filter]:bg-white/60">
@@ -198,6 +201,7 @@ export default function StrategyDetailPage() {
                         </button>
                         <div>
                             <div className="flex items-center gap-3">
+                                {/* [字体修改] 标题使用 font-serif (Merriweather) */}
                                 <h1 className="text-2xl font-serif font-bold text-slate-900 tracking-tight">
                                     {data.name}
                                 </h1>
@@ -217,7 +221,8 @@ export default function StrategyDetailPage() {
                     <div className="hidden md:flex items-center gap-3">
                         <div className="text-right mr-2">
                             <div className="text-[10px] uppercase text-slate-400 font-bold tracking-wider">Latest NAV</div>
-                            <div className="text-lg font-mono font-bold text-slate-900">
+                            {/* [字体修改] 净值数据使用 font-mono-financial */}
+                            <div className="text-lg font-mono-financial text-slate-900">
                                 {data.navCurve.length > 0 ? data.navCurve[data.navCurve.length - 1].strategy.toFixed(4) : '-'}
                             </div>
                         </div>
@@ -239,7 +244,7 @@ export default function StrategyDetailPage() {
                         <MetricCard
                             label="累计收益"
                             value={`${(data.metrics.totalReturn * 100).toFixed(2)}%`}
-                            trend={data.metrics.totalReturn > 0 ? 'up' : 'down'} // 这里简单假设红色为涨
+                            trend={data.metrics.totalReturn > 0 ? 'up' : 'down'}
                             highlight
                         />
                         <MetricCard
@@ -257,11 +262,10 @@ export default function StrategyDetailPage() {
                             value={data.metrics.sharpe.toFixed(3)}
                             highlight
                         />
-                        {/* 回撤通常用绿色表示安全，红色表示危险，这里保持中性或使用自定义逻辑 */}
                         <MetricCard
                             label="最大回撤"
-                            value={`${data.metrics.maxDrawdown.toFixed(2)}%`}
-                            trend="down" // 假设 down = green (好)
+                            value={`${(data.metrics.maxDrawdown * 100).toFixed(2)}%`}
+                            trend="down"
                         />
                         <MetricCard
                             label="胜率"
@@ -275,7 +279,6 @@ export default function StrategyDetailPage() {
                         <MetricCard
                             label="波动率"
                             value={`${(data.metrics.volatility * 100).toFixed(2)}%`}
-                            subValue={`Base: ${(data.metrics.benchmarkVolatility * 100).toFixed(1)}%`}
                         />
                         <MetricCard label="盈亏比" value={data.metrics.plRatio.toFixed(3)} />
                         <MetricCard label="盈亏场次" value={`${data.metrics.winCount} / ${data.metrics.lossCount}`} />
@@ -351,7 +354,7 @@ export default function StrategyDetailPage() {
                                     name="基准净值"
                                     animationDuration={1500}
                                 />
-                                {/* 策略线 - 使用 Area 让视觉更饱满 */}
+                                {/* 策略线 */}
                                 <Area
                                     type="monotone"
                                     dataKey="strategy"
@@ -380,7 +383,8 @@ export default function StrategyDetailPage() {
                                 <select
                                     value={holdingDate}
                                     onChange={(e) => setHoldingDate(e.target.value)}
-                                    className="appearance-none bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block w-40 p-2.5 pr-8 shadow-sm font-mono cursor-pointer hover:border-teal-400 transition-colors"
+                                    // [字体修改] 下拉菜单日期使用 font-mono-financial
+                                    className="appearance-none bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 block w-40 p-2.5 pr-8 shadow-sm font-mono-financial cursor-pointer hover:border-teal-400 transition-colors"
                                 >
                                     {availableDates.map(date => (
                                         <option key={date} value={date}>{date}</option>
@@ -407,7 +411,8 @@ export default function StrategyDetailPage() {
                                 .filter(h => h.date === holdingDate)
                                 .map((stock, idx) => (
                                     <tr key={idx} className="bg-white hover:bg-teal-50/30 transition-colors group">
-                                        <td className="px-6 py-4 font-mono font-medium text-slate-600 group-hover:text-teal-700 transition-colors">
+                                        {/* [字体修改] 股票代码使用 font-mono-financial */}
+                                        <td className="px-6 py-4 font-mono-financial text-slate-600 group-hover:text-teal-700 transition-colors">
                                             {stock.code}
                                         </td>
                                         <td className="px-6 py-4 font-bold text-slate-800">
@@ -418,7 +423,8 @@ export default function StrategyDetailPage() {
                                                 {stock.industry}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-right font-mono font-bold text-slate-700">
+                                        {/* [字体修改] 权重数字使用 font-mono-financial */}
+                                        <td className="px-6 py-4 text-right font-mono-financial text-slate-700">
                                             {stock.weight.toFixed(2)}%
                                         </td>
                                         <td className="px-6 py-4">

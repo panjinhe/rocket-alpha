@@ -17,7 +17,7 @@
     "plRatio": 1.628,
     "winCount": 5514,
     "lossCount": 3651,
-    "maxDrawdown": 47.150
+    "maxDrawdown": 0.47
   },
   "navCurve": [
     { "date": "2024-10-31", "strategy": 1.0027, "benchmark": 1.0049 },
