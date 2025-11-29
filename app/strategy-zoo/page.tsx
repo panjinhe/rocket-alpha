@@ -39,12 +39,12 @@ interface RawMultiPeriodData {
 interface StrategyData {
     id: number;
     name: string;          // 策略名称
-    excessReturn: number;  // 年化超额收益 (已转换为数字)
-    sharpe: number;        // 夏普比率 (已转换为数字)
-    maxDrawdown: number;   // 最大回撤 (净值, 已转换为数字)
-    maxExcessDrawdown: number; // 最大超额回撤 (已转换为数字)
-    winRate: number;       // 相对基准胜率 (已转换为数字)
-    turnover: number;      // 年化换手率 (已转换为数字)
+    excessReturn: number;  // 年化超额收益
+    sharpe: number;        // 夏普比率
+    maxDrawdown: number;   // 最大回撤
+    maxExcessDrawdown: number; // 最大超额回撤
+    winRate: number;       // 相对基准胜率
+    turnover: number;      // 年化换手率
 }
 
 // 定义所有可排序的列键名
