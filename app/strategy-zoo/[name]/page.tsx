@@ -120,17 +120,34 @@ const StrategyLogicCard = ({ data }: { data: MethodologyData }) => {
     );
 };
 
-// --- 组件：美化后的指标卡片 (保持不变) ---
-const MetricCard = ({ label, value, subValue, highlight = false, trend = 'neutral' }: any) => (
+// 1. 定义 MetricCard 的 Props 接口
+interface MetricCardProps {
+    label: string;
+    value: string | number;
+    subValue?: string;
+    highlight?: boolean;
+    trend?: 'up' | 'down' | 'neutral';
+}
+
+// 2. 使用接口替代 any
+const MetricCard = ({
+                        label,
+                        value,
+                        subValue,
+                        highlight = false,
+                        trend = 'neutral'
+                    }: MetricCardProps) => (
     <div className={`
         group relative p-5 bg-white border rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1
         ${highlight ? 'border-teal-500 shadow-md ring-1 ring-teal-50' : 'border-gray-100'}
     `}>
         {highlight && <div className="absolute top-0 right-0 p-3 opacity-5 text-teal-600"><Activity size={48}/></div>}
+
         <div className="flex justify-between items-start mb-2">
             <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{label}</div>
             {highlight && <div className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse"></div>}
         </div>
+
         <div className={`text-2xl font-mono-financial tracking-tight ${
             trend === 'up' ? 'text-red-600' :
                 trend === 'down' ? 'text-green-600' :
@@ -138,6 +155,7 @@ const MetricCard = ({ label, value, subValue, highlight = false, trend = 'neutra
         }`}>
             {value}
         </div>
+
         {subValue && (
             <div className="text-xs text-gray-400 mt-2 font-medium flex items-center gap-1">
                 {subValue}

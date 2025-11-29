@@ -284,16 +284,16 @@
     { "date": "2025-10-31", "strategy": 1.2008, "benchmark": 1.0095 }
   ],
   "holdings": [
-    { "date": "2025-10-31", "code": "600519.SH", "name": "贵州茅台", "weight": 5.2, "industry": "食品饮料" },
-    { "date": "2025-10-31", "code": "300750.SZ", "name": "宁德时代", "weight": 3.8, "industry": "电力设备" },
-    { "date": "2025-10-31", "code": "601318.SH", "name": "中国平安", "weight": 2.5, "industry": "非银金融" },
-    { "date": "2025-10-31", "code": "002594.SZ", "name": "比亚迪", "weight": 2.2, "industry": "汽车" },
-    { "date": "2025-10-31", "code": "600036.SH", "name": "招商银行", "weight": 2.0, "industry": "银行" },
-    { "date": "2025-10-31", "code": "601166.SH", "name": "兴业银行", "weight": 1.8, "industry": "银行" },
-    { "date": "2025-10-31", "code": "000858.SZ", "name": "五粮液", "weight": 1.6, "industry": "食品饮料" },
-    { "date": "2025-10-31", "code": "601888.SH", "name": "中国中免", "weight": 1.4, "industry": "商贸零售" },
-    { "date": "2025-10-31", "code": "300015.SZ", "name": "爱尔眼科", "weight": 1.2, "industry": "医药生物" },
-    { "date": "2025-10-31", "code": "000001.SZ", "name": "平安银行", "weight": 1.0, "industry": "银行" }
+    { "date": "2025-10", "code": "600519.SH", "name": "贵州茅台", "weight": 5.2, "industry": "食品饮料" },
+    { "date": "2025-10", "code": "300750.SZ", "name": "宁德时代", "weight": 3.8, "industry": "电力设备" },
+    { "date": "2025-10", "code": "601318.SH", "name": "中国平安", "weight": 2.5, "industry": "非银金融" },
+    { "date": "2025-10", "code": "002594.SZ", "name": "比亚迪", "weight": 2.2, "industry": "汽车" },
+    { "date": "2025-10", "code": "600036.SH", "name": "招商银行", "weight": 2.0, "industry": "银行" },
+    { "date": "2025-10", "code": "601166.SH", "name": "兴业银行", "weight": 1.8, "industry": "银行" },
+    { "date": "2025-10", "code": "000858.SZ", "name": "五粮液", "weight": 1.6, "industry": "食品饮料" },
+    { "date": "2025-10", "code": "601888.SH", "name": "中国中免", "weight": 1.4, "industry": "商贸零售" },
+    { "date": "2025-10", "code": "300015.SZ", "name": "爱尔眼科", "weight": 1.2, "industry": "医药生物" },
+    { "date": "2025-10", "code": "000001.SZ", "name": "平安银行", "weight": 1.0, "industry": "银行" }
   ],
   "methodology": {
     "description": "本策略旨在捕捉小市值效应与低波动异常。通过对全市场股票进行市值与波动率的双重排序，构建一个风险调整后收益更高的组合。策略核心假设是市场往往低估低波动股票的安全性，同时小市值股票具备更高的成长弹性。",
